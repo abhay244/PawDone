@@ -1,0 +1,16 @@
+# Xcode
+ios/.build/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# Secrets: copy ios/Config/Secrets.example.xcconfig to Secrets.xcconfig
+ios/Config/Secrets.xcconfig
+.env
+
+# Supabase CLI
+supabase/.branches/
+supabase/.temp/
+
+.DS_Store
+.idea/
