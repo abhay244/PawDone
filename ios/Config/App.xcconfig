@@ -1,0 +1,8 @@
+// Build settings for the PawDone app target.
+// Supabase connection details come from Secrets.xcconfig, which isn't committed.
+// Copy Secrets.example.xcconfig to Secrets.xcconfig and fill it in.
+
+SUPABASE_HOST =
+SUPABASE_ANON_KEY =
+
+#include? "Secrets.xcconfig"
