@@ -23,6 +23,8 @@ protocol PetBackend: AnyObject {
 
     /// The pet's tasks for one day (`yyyy-MM-dd`), in time order.
     func fetchOccurrences(petID: UUID, date: String) async throws -> [Occurrence]
+    /// The pet's tasks for a range of days (`yyyy-MM-dd`, inclusive), in time order.
+    func fetchOccurrences(petID: UUID, from: String, to: String) async throws -> [Occurrence]
     func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence
     func undoOccurrence(id: UUID) async throws -> Occurrence
 }

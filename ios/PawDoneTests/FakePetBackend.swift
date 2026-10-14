@@ -91,6 +91,14 @@ final class FakePetBackend: PetBackend {
         return occurrences.filter { $0.petID == petID && $0.date == date }
     }
 
+    private(set) var requestedRanges: [ClosedRange<String>] = []
+
+    func fetchOccurrences(petID: UUID, from: String, to: String) async throws -> [Occurrence] {
+        try checkFailure()
+        requestedRanges.append(from...to)
+        return occurrences.filter { $0.petID == petID && (from...to).contains($0.date) }
+    }
+
     func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence {
         try checkFailure()
         completedNotes.append(note)

@@ -12,6 +12,11 @@ docs/       Product spec
 design/     Icon and logo source files
 ```
 
+## Workflow
+
+- Day-to-day work happens on `dev`. Pull requests go from `dev` into `main`.
+- Merging into `main` deploys new database migrations: the Supabase GitHub integration applies anything new in `supabase/migrations`.
+
 ## Run the app
 
 1. Generate the Xcode project (needed after editing `ios/project.yml`; new Swift files are picked up automatically):

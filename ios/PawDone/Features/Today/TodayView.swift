@@ -120,10 +120,12 @@ struct OccurrenceRow: View {
         .contentShape(.rect)
     }
 
-    private var isOverdue: Bool { store.isOverdue(occurrence) }
+    private var status: Occurrence.Status { occurrence.effectiveStatus(today: store.todayString) }
+
+    private var isOverdue: Bool { status == .pending && store.isOverdue(occurrence) }
 
     private var detail: String {
-        switch occurrence.status {
+        switch status {
         case .done:
             let time = occurrence.completedAt.map { " at \(store.time($0))" } ?? ""
             return "\(store.name(for: occurrence.completedBy))\(time)"
@@ -136,7 +138,7 @@ struct OccurrenceRow: View {
     }
 
     @ViewBuilder private var statusIcon: some View {
-        switch occurrence.status {
+        switch status {
         case .done:
             Image(systemName: "checkmark.circle.fill")
                 .font(.title2)

@@ -46,6 +46,8 @@ struct MainTabView: View {
         TabView {
             TodayView()
                 .tabItem { Label("Today", systemImage: "checklist") }
+            ReportsView()
+                .tabItem { Label("Reports", systemImage: "chart.bar") }
             ScheduleView()
                 .tabItem { Label("Schedule", systemImage: "calendar") }
             AccountView()

@@ -32,7 +32,10 @@ struct OccurrenceDetailSheet: View {
                             LabeledContent("Done at", value: store.time(completedAt))
                         }
                     } else {
-                        LabeledContent("Status", value: "Missed")
+                        LabeledContent(
+                            "Status",
+                            value: occurrence.effectiveStatus(today: store.todayString) == .missed ? "Missed" : "Not done yet"
+                        )
                     }
                 }
 
