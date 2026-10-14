@@ -25,6 +25,25 @@ struct AccountView: View {
                     }
                 }
 
+                if let pet = store.pet {
+                    Section {
+                        Toggle("Reminders for \(pet.name)", isOn: remindersEnabled)
+                        if PushRegistrar.shared.authorizationStatus == .denied {
+                            Button("Turn on notifications in Settings") {
+                                if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Notifications")
+                    } footer: {
+                        Text(PushRegistrar.shared.authorizationStatus == .denied
+                            ? "Notifications are off for PawDone, so reminders can't reach this phone."
+                            : "A notification when one of \(pet.name)'s tasks is due and not done yet.")
+                    }
+                }
+
                 Section {
                     TextField("Your name", text: $name)
                         .textInputAutocapitalization(.words)
@@ -48,12 +67,27 @@ struct AccountView: View {
             }
             .navigationTitle("Account")
             .onAppear { name = store.myName }
-            .alert("Couldn't save your name", isPresented: isShowingError) {
+            .alert("Couldn't save", isPresented: isShowingError) {
                 Button("OK") {}
             } message: {
                 Text(errorMessage ?? "")
             }
         }
+    }
+
+    private var remindersEnabled: Binding<Bool> {
+        Binding(
+            get: { store.remindersEnabled },
+            set: { enabled in
+                Task {
+                    do {
+                        try await store.setRemindersEnabled(enabled)
+                    } catch {
+                        errorMessage = UserFacingError.message(for: error)
+                    }
+                }
+            }
+        )
     }
 
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }

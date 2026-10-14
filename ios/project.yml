@@ -53,6 +53,7 @@ targets:
       path: Support/PawDone.entitlements
       properties:
         com.apple.developer.applesignin: [Default]
+        aps-environment: development
     dependencies:
       - package: Supabase
     scheme:

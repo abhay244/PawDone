@@ -9,7 +9,7 @@ struct AppServices {
 
     static func live() -> AppServices {
         #if DEBUG
-        if isDemo { return demo() }
+        if isDemo { return demo().connectingPush() }
         #endif
 
         var client: SupabaseClient?
@@ -26,6 +26,14 @@ struct AppServices {
                 deviceID: DeviceIdentity().id()
             ),
             petBackend: client.map { SupabasePetBackend(client: $0) }
-        )
+        ).connectingPush()
+    }
+
+    /// Sends this phone's push token to the server whenever iOS hands out a new one.
+    private func connectingPush() -> AppServices {
+        PushRegistrar.shared.onToken = { [weak session] token in
+            Task { await session?.updatePushToken(token) }
+        }
+        return self
     }
 }

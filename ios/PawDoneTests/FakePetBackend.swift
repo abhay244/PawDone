@@ -60,6 +60,17 @@ final class FakePetBackend: PetBackend {
         return pets[index]
     }
 
+    var remindersEnabled: [UUID: Bool] = [:]
+
+    func fetchRemindersEnabled(petID: UUID) async throws -> Bool {
+        remindersEnabled[petID] ?? true
+    }
+
+    func setRemindersEnabled(_ enabled: Bool, petID: UUID) async throws {
+        try checkFailure()
+        remindersEnabled[petID] = enabled
+    }
+
     func fetchTasks(petID: UUID) async throws -> [PetTask] {
         tasks.filter { $0.petID == petID }
     }

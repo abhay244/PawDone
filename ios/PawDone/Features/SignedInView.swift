@@ -33,10 +33,22 @@ struct SignedInView: View {
         }
         .environment(store)
         .task { await store.load() }
+        // Ask for notifications once the pet is set up, so the prompt makes sense.
+        .task(id: store.phase == .ready) {
+            if store.phase == .ready {
+                await PushRegistrar.shared.requestAuthorizationAndRegister()
+            }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active, store.phase == .ready {
-                Task { await store.refreshToday() }
+                Task {
+                    await store.refreshToday()
+                    await PushRegistrar.shared.refreshStatus()
+                }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .pushReceived)) { _ in
+            Task { await store.refreshToday() }
         }
     }
 }

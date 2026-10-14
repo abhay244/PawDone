@@ -35,6 +35,13 @@ final class FakeSessionBackend: SessionBackend {
         try deviceStatusResult.get()
     }
 
+    /// Every push token sent, in order, with the session still signed in at the time.
+    private(set) var pushTokens: [(token: String?, environment: String, signedIn: Bool)] = []
+
+    func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {
+        pushTokens.append((token, environment, hasSession))
+    }
+
     /// Like the Supabase SDK, signing out also emits a session-ended event.
     func signOut() async {
         signOutCount += 1

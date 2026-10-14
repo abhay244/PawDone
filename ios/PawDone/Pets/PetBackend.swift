@@ -15,6 +15,10 @@ protocol PetBackend: AnyObject {
     func createPet(_ fields: PetFields, timezone: String) async throws -> Pet
     func updatePet(id: UUID, fields: PetFields) async throws -> Pet
 
+    /// Whether the user gets reminders for this pet. On unless they turned it off.
+    func fetchRemindersEnabled(petID: UUID) async throws -> Bool
+    func setRemindersEnabled(_ enabled: Bool, petID: UUID) async throws
+
     /// Active (not archived) tasks.
     func fetchTasks(petID: UUID) async throws -> [PetTask]
     func createTasks(_ tasks: [TaskFields]) async throws

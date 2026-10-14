@@ -13,6 +13,9 @@ protocol SessionBackend: AnyObject {
     func registerDevice(id: String, force: Bool) async throws -> DeviceRegistration
     func deviceStatus(id: String) async throws -> DeviceStatus
 
+    /// Saves this phone's push token, or clears it with nil. `environment` is "sandbox" or "production".
+    func setPushToken(_ token: String?, deviceID: String, environment: String) async throws
+
     /// Signs out on this device only.
     func signOut() async
 
