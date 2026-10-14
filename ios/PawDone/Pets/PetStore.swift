@@ -22,12 +22,12 @@ final class PetStore {
 
     @ObservationIgnored let photos: ProofPhotoStore
     @ObservationIgnored private let backend: any PetBackend
-    @ObservationIgnored private let now: () -> Date
+    @ObservationIgnored private let currentDate: () -> Date
 
     init(backend: any PetBackend, photos: ProofPhotoStore = ProofPhotoStore(), now: @escaping () -> Date = { .now }) {
         self.backend = backend
         self.photos = photos
-        self.now = now
+        self.currentDate = now
     }
 
     var myUserID: UUID? { backend.currentUserID }
@@ -42,7 +42,22 @@ final class PetStore {
 
     /// Today's date in the pet's timezone, as stored in the database.
     var todayString: String {
-        ServerDate.dayString(for: now(), in: pet?.timeZone ?? .current)
+        ServerDate.dayString(for: currentDate(), in: pet?.timeZone ?? .current)
+    }
+
+    /// A calendar in the pet's timezone, for reports.
+    var calendar: Calendar {
+        var calendar = Calendar.current
+        calendar.timeZone = pet?.timeZone ?? .current
+        return calendar
+    }
+
+    var now: Date { currentDate() }
+
+    /// Tasks for a range of days (`yyyy-MM-dd`, inclusive), for reports.
+    func occurrences(from: String, to: String) async throws -> [Occurrence] {
+        guard let pet else { return [] }
+        return try await backend.fetchOccurrences(petID: pet.id, from: from, to: to)
     }
 
     /// A time of day as the pet experiences it, e.g. "8:00 AM".
@@ -51,7 +66,7 @@ final class PetStore {
     }
 
     func isOverdue(_ occurrence: Occurrence) -> Bool {
-        occurrence.status == .pending && occurrence.scheduledAt < now()
+        occurrence.status == .pending && occurrence.scheduledAt < currentDate()
     }
 
     func name(for userID: UUID?) -> String {

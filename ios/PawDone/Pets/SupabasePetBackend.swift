@@ -99,6 +99,17 @@ final class SupabasePetBackend: PetBackend {
             .value
     }
 
+    func fetchOccurrences(petID: UUID, from: String, to: String) async throws -> [Occurrence] {
+        try await client.from("task_occurrences")
+            .select("*,task:tasks(instructions)")
+            .eq("pet_id", value: petID.uuidString)
+            .gte("date", value: from)
+            .lte("date", value: to)
+            .order("scheduled_at")
+            .execute()
+            .value
+    }
+
     func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence {
         try await client
             .rpc("complete_occurrence", params: CompleteParams(occurrenceID: id, note: note))
