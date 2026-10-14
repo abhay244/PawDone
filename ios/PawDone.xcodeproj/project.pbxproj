@@ -21,7 +21,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B413B0B2891EB00C9D2EC6 /* PawDoneTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PawDoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27CB8AD5F5BB5A500DFCC467 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -29,19 +29,11 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0DB3405B808A88E4F16A8BDC /* PawDoneTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
 			path = PawDoneTests;
 			sourceTree = "<group>";
 		};
 		F865FAF1A2AA6337D35D2773 /* PawDone */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
 			path = PawDone;
 			sourceTree = "<group>";
 		};
@@ -143,6 +135,14 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					7EB6D10C790A60AA1EB95322 = {
+						DevelopmentTeam = LS942W7YC2;
+						ProvisioningStyle = Automatic;
+					};
+					C8236D71E7E560E2AD0AD473 = {
+						DevelopmentTeam = LS942W7YC2;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 2F2ED1E7E05AD95EBBFA3BC9 /* Build configuration list for PBXProject "PawDone" */;
@@ -244,9 +244,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LS942W7YC2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -383,9 +385,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LS942W7YC2;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

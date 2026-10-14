@@ -31,10 +31,6 @@ final class SessionStore {
         self.deviceID = deviceID
     }
 
-    static func live() -> SessionStore {
-        SessionStore(backend: SupabaseSessionBackend.fromConfig(), deviceID: DeviceIdentity().id())
-    }
-
     func start() async {
         guard state == .loading else { return }
         guard let backend else {
