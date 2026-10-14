@@ -22,6 +22,8 @@ design/     Icon and logo source files
 
 Without Supabase details the app runs, but sign-in is disabled.
 
+**Demo mode:** Sign in with Apple is unreliable in the simulator. To try the app there without signing in, add `-PawDoneDemo` under **Product → Scheme → Edit Scheme → Run → Arguments**. It uses in-memory sample data and no server. Debug builds only.
+
 ## Connect Supabase
 
 1. Create a project at [supabase.com](https://supabase.com).

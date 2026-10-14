@@ -13,6 +13,8 @@ settings:
     SWIFT_APPROACHABLE_CONCURRENCY: YES
     MARKETING_VERSION: 0.1.0
     CURRENT_PROJECT_VERSION: 1
+    DEVELOPMENT_TEAM: LS942W7YC2
+    CODE_SIGN_STYLE: Automatic
 
 packages:
   Supabase:
@@ -44,6 +46,7 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: PawDone uses the camera to take photo proof that your pet's care was done.
         SUPABASE_HOST: $(SUPABASE_HOST)
         SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
     entitlements:

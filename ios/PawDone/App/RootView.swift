@@ -2,6 +2,8 @@ import SwiftUI
 
 /// Shows the right screen for the current sign-in state.
 struct RootView: View {
+    let petBackend: (any PetBackend)?
+
     @Environment(SessionStore.self) private var session
     @Environment(\.scenePhase) private var scenePhase
 
@@ -17,7 +19,9 @@ struct RootView: View {
             case .signedOutElsewhere:
                 SignedOutElsewhereView()
             case .signedIn:
-                HomeView()
+                if let petBackend {
+                    SignedInView(backend: petBackend)
+                }
             }
         }
         .task { await session.start() }

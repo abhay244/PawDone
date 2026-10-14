@@ -8,17 +8,6 @@ final class SupabaseSessionBackend: SessionBackend {
         self.client = client
     }
 
-    /// Nil until the Supabase details are filled in in Config/Secrets.xcconfig.
-    static func fromConfig() -> SupabaseSessionBackend? {
-        guard let url = AppConfig.supabaseURL, let key = AppConfig.supabaseAnonKey else { return nil }
-        let client = SupabaseClient(
-            supabaseURL: url,
-            supabaseKey: key,
-            options: SupabaseClientOptions(auth: .init(emitLocalSessionAsInitialSession: true))
-        )
-        return SupabaseSessionBackend(client: client)
-    }
-
     var hasSession: Bool {
         client.auth.currentSession != nil
     }
