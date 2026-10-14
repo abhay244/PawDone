@@ -75,6 +75,7 @@ final class PetStore {
             try await reloadPetData()
             phase = .ready
         } catch {
+            _ = UserFacingError.message(for: error) // Logs the details.
             phase = .failed("Check your connection and try again.")
         }
     }

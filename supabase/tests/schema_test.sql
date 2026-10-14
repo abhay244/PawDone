@@ -103,8 +103,12 @@ end $$;
 
 -- ─── Pets ───────────────────────────────────────────────────────────────────
 
+-- With returning, like the app's insert().select().
 insert into public.pets (owner_id, name, species, timezone)
-values ('00000000-0000-0000-0000-00000000000a', 'Bruno', 'dog', 'Asia/Kolkata');
+values ('00000000-0000-0000-0000-00000000000a', 'Bruno', 'dog', 'Asia/Kolkata')
+returning id;
+
+update public.pets set breed = 'Beagle' returning id;
 
 select tests.expect_error(
   $$insert into public.pets (owner_id, name, species) values ('00000000-0000-0000-0000-00000000000a', 'Milo', 'cat')$$,
