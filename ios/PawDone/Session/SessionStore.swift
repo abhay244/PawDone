@@ -22,13 +22,15 @@ final class SessionStore {
 
     @ObservationIgnored private let backend: (any SessionBackend)?
     @ObservationIgnored private let deviceID: String
+    @ObservationIgnored private let pushEnvironment: String
     @ObservationIgnored private var isEndingSession = false
     @ObservationIgnored private var isVerifyingDevice = false
     @ObservationIgnored private var sessionEndedTask: Task<Void, Never>?
 
-    init(backend: (any SessionBackend)?, deviceID: String) {
+    init(backend: (any SessionBackend)?, deviceID: String, pushEnvironment: String = PushRegistrar.environment) {
         self.backend = backend
         self.deviceID = deviceID
+        self.pushEnvironment = pushEnvironment
     }
 
     func start() async {
@@ -81,7 +83,15 @@ final class SessionStore {
     }
 
     func signOut() async {
+        // Stop notifications to this phone. Best effort: signing out shouldn't fail offline.
+        try? await backend?.setPushToken(nil, deviceID: deviceID, environment: pushEnvironment)
         await endSession(then: .signedOut)
+    }
+
+    /// Saves this phone's push token for the signed-in account.
+    func updatePushToken(_ token: String) async {
+        guard state == .signedIn else { return }
+        try? await backend?.setPushToken(token, deviceID: deviceID, environment: pushEnvironment)
     }
 
     func dismissSignedOutElsewhere() {

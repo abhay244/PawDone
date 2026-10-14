@@ -44,6 +44,24 @@ Without Supabase details the app runs, but sign-in is disabled.
 4. Turn on Apple sign-in: **Authentication → Sign In / Providers → Apple**. Enable it and add `com.abhaysingh.pawdone` under **Client IDs**.
 5. Copy `ios/Config/Secrets.example.xcconfig` to `ios/Config/Secrets.xcconfig` and fill in the project host and anon key from **Project Settings → API**. This file isn't committed.
 
+## Push notifications
+
+Reminders and "task done" alerts are sent by the `send-push` Edge Function, which pg_cron calls every minute. One-time setup:
+
+1. **APNs key:** in [Certificates, Identifiers & Profiles → Keys](https://developer.apple.com/account/resources/authkeys/list), create a key with **Apple Push Notifications service (APNs)** enabled for Sandbox and Production. Download the `.p8` file (Apple only lets you download it once) and note its **Key ID**.
+2. **Function secrets:** in Supabase, go to **Edge Functions → Secrets** and add:
+   - `APNS_KEY_ID`: the Key ID
+   - `APNS_TEAM_ID`: `LS942W7YC2`
+   - `APNS_PRIVATE_KEY`: the whole contents of the `.p8` file
+3. **Vault secrets for the cron job:** run in the **SQL Editor**, with your own values:
+   ```sql
+   select vault.create_secret('https://YOUR-PROJECT-REF.supabase.co', 'project_url');
+   select vault.create_secret('YOUR-ANON-KEY', 'anon_key');
+   ```
+4. Merge into `main`. The GitHub integration applies the migrations and deploys the function declared in `supabase/config.toml`.
+
+Check it's running in **Edge Functions → send-push → Logs**: there should be a run every minute.
+
 ## Sign in with Apple
 
 This needs an Apple Developer Program membership. In Xcode, open **PawDone target → Signing & Capabilities**, pick your team, and keep the Sign in with Apple capability. To test in the simulator, sign in to an Apple Account in the simulator's Settings app first.
@@ -51,6 +69,7 @@ This needs an Apple Developer Program membership. In Xcode, open **PawDone targe
 ## Tests
 
 - **Database:** `supabase/tests/run.sh` runs the migrations and behaviour tests against a throwaway Postgres in Docker.
+- **Push sending:** `node --test supabase/tests/` tests the APNs signing and request code.
 - **App:** press ⌘U in Xcode, or:
   ```bash
   cd ios && xcodebuild test -project PawDone.xcodeproj -scheme PawDone -destination 'platform=iOS Simulator,name=iPhone 17'

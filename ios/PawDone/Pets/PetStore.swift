@@ -19,6 +19,8 @@ final class PetStore {
     private(set) var tasks: [PetTask] = []
     private(set) var today: [Occurrence] = []
     private(set) var names: [UUID: String] = [:]
+    /// Whether this user gets reminders for the pet.
+    private(set) var remindersEnabled = true
 
     @ObservationIgnored let photos: ProofPhotoStore
     @ObservationIgnored private let backend: any PetBackend
@@ -88,6 +90,9 @@ final class PetStore {
                 return
             }
             try await reloadPetData()
+            if let pet {
+                remindersEnabled = (try? await backend.fetchRemindersEnabled(petID: pet.id)) ?? true
+            }
             phase = .ready
         } catch {
             _ = UserFacingError.message(for: error) // Logs the details.
@@ -128,6 +133,19 @@ final class PetStore {
         try await backend.createTasks(newTasks)
         try await reloadPetData()
         phase = .ready
+    }
+
+    // MARK: Notifications
+
+    func setRemindersEnabled(_ enabled: Bool) async throws {
+        guard let pet else { return }
+        remindersEnabled = enabled
+        do {
+            try await backend.setRemindersEnabled(enabled, petID: pet.id)
+        } catch {
+            remindersEnabled = !enabled
+            throw error
+        }
     }
 
     // MARK: Pet and schedule (owner only)

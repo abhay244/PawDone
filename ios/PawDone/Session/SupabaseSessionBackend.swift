@@ -48,6 +48,12 @@ final class SupabaseSessionBackend: SessionBackend {
         return status
     }
 
+    func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {
+        try await client
+            .rpc("set_push_token", params: SetPushTokenParams(deviceID: deviceID, token: token, environment: environment))
+            .execute()
+    }
+
     func signOut() async {
         try? await client.auth.signOut(scope: .local)
     }
@@ -73,6 +79,26 @@ nonisolated private struct RegisterDeviceParams: Encodable, Sendable {
     enum CodingKeys: String, CodingKey {
         case deviceID = "p_device_id"
         case force = "p_force"
+    }
+}
+
+nonisolated private struct SetPushTokenParams: Encodable, Sendable {
+    let deviceID: String
+    let token: String?
+    let environment: String
+
+    enum CodingKeys: String, CodingKey {
+        case deviceID = "p_device_id"
+        case token = "p_token"
+        case environment = "p_environment"
+    }
+
+    // Always send p_token, as null when clearing, so the call matches the function's signature.
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(deviceID, forKey: .deviceID)
+        try container.encode(token, forKey: .token)
+        try container.encode(environment, forKey: .environment)
     }
 }
 

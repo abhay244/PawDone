@@ -1,0 +1,10 @@
+# Supabase project settings. The GitHub integration reads this when deploying `main`:
+# it deploys the Edge Functions declared below. Other settings are managed in the dashboard.
+
+project_id = "PawDone"
+
+# Sends task reminders and "task done" alerts. Called every minute by pg_cron with the
+# anon key, so JWT verification stays on.
+[functions.send-push]
+enabled = true
+verify_jwt = true

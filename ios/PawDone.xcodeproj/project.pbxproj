@@ -21,7 +21,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B413B0B2891EB00C9D2EC6 /* PawDoneTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PawDoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27CB8AD5F5BB5A500DFCC467 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -29,11 +29,19 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0DB3405B808A88E4F16A8BDC /* PawDoneTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = PawDoneTests;
 			sourceTree = "<group>";
 		};
 		F865FAF1A2AA6337D35D2773 /* PawDone */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = PawDone;
 			sourceTree = "<group>";
 		};

@@ -1,9 +1,14 @@
 -- Minimal stand-in for Supabase's roles and auth schema, so the migrations can be
 -- tested on plain Postgres. Not a migration: never run this against Supabase.
 
-create role anon nologin;
-create role authenticated nologin;
-create role service_role nologin bypassrls;
+-- Roles are cluster-wide, so they may exist from an earlier test database.
+do $$
+begin
+  create role anon nologin;
+  create role authenticated nologin;
+  create role service_role nologin bypassrls;
+exception when duplicate_object then null;
+end $$;
 
 create schema auth;
 

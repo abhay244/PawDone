@@ -22,6 +22,7 @@ private final class DemoSessionBackend: SessionBackend {
     func saveProfileName(_ name: String) async throws {}
     func registerDevice(id: String, force: Bool) async throws -> DeviceRegistration { .registered }
     func deviceStatus(id: String) async throws -> DeviceStatus { .active }
+    func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {}
     func signOut() async {}
     func sessionEndedEvents() -> AsyncStream<Void> { AsyncStream { _ in } }
 }
@@ -59,6 +60,11 @@ private final class DemoPetBackend: PetBackend {
         pets[0].gender = fields.gender
         return pets[0]
     }
+
+    private var remindersEnabled = true
+
+    func fetchRemindersEnabled(petID: UUID) async throws -> Bool { remindersEnabled }
+    func setRemindersEnabled(_ enabled: Bool, petID: UUID) async throws { remindersEnabled = enabled }
 
     func fetchTasks(petID: UUID) async throws -> [PetTask] {
         tasks.sorted { $0.timeOfDay < $1.timeOfDay }

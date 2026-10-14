@@ -60,6 +60,28 @@ final class SupabasePetBackend: PetBackend {
             .value
     }
 
+    func fetchRemindersEnabled(petID: UUID) async throws -> Bool {
+        guard let userID = currentUserID else { return true }
+        let rows: [NotificationPreference] = try await client.from("notification_prefs")
+            .select()
+            .eq("user_id", value: userID.uuidString)
+            .eq("pet_id", value: petID.uuidString)
+            .execute()
+            .value
+        return rows.first?.remindersEnabled ?? true
+    }
+
+    func setRemindersEnabled(_ enabled: Bool, petID: UUID) async throws {
+        guard let userID = currentUserID else { throw NotSignedIn() }
+        try await client.from("notification_prefs")
+            .upsert(
+                NotificationPreference(userID: userID, petID: petID, remindersEnabled: enabled),
+                onConflict: "user_id,pet_id",
+                returning: .minimal
+            )
+            .execute()
+    }
+
     func fetchTasks(petID: UUID) async throws -> [PetTask] {
         try await client.from("tasks")
             .select()
@@ -153,6 +175,18 @@ nonisolated private struct NewPet: Encodable {
         case name, species, breed, gender, timezone
         case ownerID = "owner_id"
         case birthDate = "birth_date"
+    }
+}
+
+nonisolated private struct NotificationPreference: Codable {
+    let userID: UUID
+    let petID: UUID
+    let remindersEnabled: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case userID = "user_id"
+        case petID = "pet_id"
+        case remindersEnabled = "reminders_enabled"
     }
 }
 
