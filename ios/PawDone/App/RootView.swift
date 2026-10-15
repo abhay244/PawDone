@@ -3,6 +3,7 @@ import SwiftUI
 /// Shows the right screen for the current sign-in state.
 struct RootView: View {
     let petBackend: (any PetBackend)?
+    let subscriptions: (any SubscriptionService)?
 
     @Environment(SessionStore.self) private var session
     @Environment(\.scenePhase) private var scenePhase
@@ -20,7 +21,7 @@ struct RootView: View {
                 SignedOutElsewhereView()
             case .signedIn:
                 if let petBackend {
-                    SignedInView(backend: petBackend)
+                    SignedInView(backend: petBackend, subscriptions: subscriptions)
                 }
             }
         }

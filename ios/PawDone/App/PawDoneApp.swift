@@ -8,7 +8,7 @@ struct PawDoneApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(petBackend: services.petBackend)
+            RootView(petBackend: services.petBackend, subscriptions: services.subscriptions)
                 .environment(services.session)
                 // Google's sign-in returns to the app through this URL.
                 .onOpenURL { GIDSignIn.sharedInstance.handle($0) }

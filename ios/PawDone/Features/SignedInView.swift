@@ -3,10 +3,12 @@ import SwiftUI
 /// Everything after sign-in: first-run setup, then the main tabs.
 struct SignedInView: View {
     @State private var store: PetStore
+    @State private var premium: PremiumStore
     @Environment(\.scenePhase) private var scenePhase
 
-    init(backend: any PetBackend) {
+    init(backend: any PetBackend, subscriptions: (any SubscriptionService)?) {
         _store = State(initialValue: PetStore(backend: backend))
+        _premium = State(initialValue: PremiumStore(service: subscriptions, backend: backend))
     }
 
     var body: some View {
@@ -32,7 +34,11 @@ struct SignedInView: View {
             }
         }
         .environment(store)
-        .task { await store.load() }
+        .environment(premium)
+        .task {
+            await premium.start(userID: store.myUserID)
+            await store.load()
+        }
         // Ask for notifications once the pet is set up, so the prompt makes sense.
         .task(id: store.phase == .ready) {
             if store.phase == .ready {

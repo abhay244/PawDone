@@ -33,6 +33,13 @@ protocol PetBackend: AnyObject {
     func completeOccurrence(id: UUID, note: String?, photoPath: String?) async throws -> Occurrence
     func undoOccurrence(id: UUID) async throws -> Occurrence
 
+    // MARK: Premium
+
+    /// The user's own subscription, or nil if they've never had one.
+    func fetchMyEntitlement() async throws -> MyEntitlement?
+    /// Asks the server to re-read the user's subscription from RevenueCat.
+    func syncPremium() async throws
+
     // MARK: Households
 
     /// Whether the pet's household has Premium (sharing and cloud photos).

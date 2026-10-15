@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4633388F95657646C2FC3A63 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = F8EF6297E01A36503EF19C08 /* GoogleSignIn */; };
+		6D87BD55AD5EF550C3479BDC /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 9A83B24A465AEF0CC9F9730D /* RevenueCat */; };
 		C7087418F3A8B2E504392C33 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C1E185520EBD12B0897CD5E3 /* GoogleSignInSwift */; };
 		F6F7CADA4EDEDE79233A520A /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A2F96A0B91ACBB0E1F0E9C00 /* Supabase */; };
 /* End PBXBuildFile section */
@@ -23,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C076FAD7F4FDE4CC61B39B /* PawDone.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PawDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07B413B0B2891EB00C9D2EC6 /* PawDoneTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PawDoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27CB8AD5F5BB5A500DFCC467 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -31,11 +32,19 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0DB3405B808A88E4F16A8BDC /* PawDoneTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = PawDoneTests;
 			sourceTree = "<group>";
 		};
 		F865FAF1A2AA6337D35D2773 /* PawDone */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = PawDone;
 			sourceTree = "<group>";
 		};
@@ -49,6 +58,7 @@
 				F6F7CADA4EDEDE79233A520A /* Supabase in Frameworks */,
 				4633388F95657646C2FC3A63 /* GoogleSignIn in Frameworks */,
 				C7087418F3A8B2E504392C33 /* GoogleSignInSwift in Frameworks */,
+				6D87BD55AD5EF550C3479BDC /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +115,7 @@
 				A2F96A0B91ACBB0E1F0E9C00 /* Supabase */,
 				F8EF6297E01A36503EF19C08 /* GoogleSignIn */,
 				C1E185520EBD12B0897CD5E3 /* GoogleSignInSwift */,
+				9A83B24A465AEF0CC9F9730D /* RevenueCat */,
 			);
 			productName = PawDone;
 			productReference = 05C076FAD7F4FDE4CC61B39B /* PawDone.app */;
@@ -162,6 +173,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8371EAC0F4A62589627ADD0B /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				EEB107B90C0B0C582BF6D630 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				7B88FD80C5731BC85C996AEC /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -470,9 +482,22 @@
 				minimumVersion = 10.0.0;
 			};
 		};
+		EEB107B90C0B0C582BF6D630 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.95.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9A83B24A465AEF0CC9F9730D /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EEB107B90C0B0C582BF6D630 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
 		A2F96A0B91ACBB0E1F0E9C00 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7B88FD80C5731BC85C996AEC /* XCRemoteSwiftPackageReference "supabase-swift" */;

@@ -11,7 +11,8 @@ extension AppServices {
     static func demo() -> AppServices {
         AppServices(
             session: SessionStore(backend: DemoSessionBackend(), deviceID: "demo-device"),
-            petBackend: DemoPetBackend()
+            petBackend: DemoPetBackend(),
+            subscriptions: DemoSubscriptionService()
         )
     }
 }
@@ -26,6 +27,25 @@ private final class DemoSessionBackend: SessionBackend {
     func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {}
     func signOut() async {}
     func sessionEndedEvents() -> AsyncStream<Void> { AsyncStream { _ in } }
+}
+
+private final class DemoSubscriptionService: SubscriptionService {
+    func start(userID: String) async {}
+
+    func plans() async throws -> [PremiumPlan] {
+        try await Task.sleep(for: .milliseconds(400))
+        return [
+            PremiumPlan(id: "demo.monthly", period: .monthly, price: "₹199.00", pricePerMonth: nil),
+            PremiumPlan(id: "demo.quarterly", period: .threeMonths, price: "₹499.00", pricePerMonth: "₹166.33"),
+        ]
+    }
+
+    func purchase(_ plan: PremiumPlan) async throws -> PurchaseOutcome {
+        try await Task.sleep(for: .seconds(1))
+        return .purchased(active: true)
+    }
+
+    func restore() async throws -> Bool { false }
 }
 
 private final class DemoPetBackend: PetBackend {
@@ -139,17 +159,28 @@ private final class DemoPetBackend: PetBackend {
         return occurrences[index]
     }
 
-    // MARK: Households: Premium, with Sam already helping. Any 8-character code joins
-    // Asha's household and its cat, Luna.
+    // MARK: Premium and households. Starts on the Free plan; buying Premium in the demo
+    // paywall unlocks it. Any 8-character code joins Asha's (Premium) household and its cat, Luna.
 
     private let samID = UUID()
     private let ashaID = UUID()
-    private lazy var memberIDs = [samID]
+    private var memberIDs: [UUID] = []
+    private var hasPremium = false
+
+    func fetchMyEntitlement() async throws -> MyEntitlement? {
+        hasPremium
+            ? MyEntitlement(isPremium: true, productID: "demo.monthly", expiresAt: .now.addingTimeInterval(30 * 86_400))
+            : nil
+    }
+
+    func syncPremium() async throws { hasPremium = true }
     private var invites: [Invite] = []
     private var memberships: [Membership] = []
     private var cloudPhotos: [String: Data] = [:]
 
-    func petHasPremium(petID: UUID) async throws -> Bool { true }
+    func petHasPremium(petID: UUID) async throws -> Bool {
+        pets.first { $0.id == petID }?.ownerID == currentUserID ? hasPremium : true
+    }
     func fetchInvites() async throws -> [Invite] { invites }
 
     func createInvite() async throws -> Invite {

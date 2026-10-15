@@ -30,6 +30,8 @@ final class PetStore {
     private(set) var remindersEnabled = true
     /// Whether the pet's household has Premium: helpers and cloud photos.
     private(set) var hasPremium = false
+    /// The user's own subscription, whichever pet is shown.
+    private(set) var myEntitlement: MyEntitlement?
     /// Helpers in the user's own household (when showing their own pet).
     private(set) var memberIDs: [UUID] = []
     /// Open invites to the user's own household.
@@ -67,6 +69,9 @@ final class PetStore {
     var doneCount: Int { today.count { $0.status == .done } }
 
     var canInviteMore: Bool { memberIDs.count + invites.count < Self.householdLimit }
+
+    /// Whether the user has their own active Premium subscription.
+    var iHavePremium: Bool { myEntitlement?.isActive(at: currentDate()) ?? false }
 
     /// Households hidden because their owner's Premium ended.
     var pausedMemberships: [Membership] { memberships.filter { !$0.active } }
@@ -177,8 +182,14 @@ final class PetStore {
         names = try await backend.fetchProfileNames()
     }
 
+    /// Re-reads Premium after a purchase or restore.
+    func refreshPremium() async {
+        await reloadPetSettings()
+    }
+
     /// Settings that can fall back to defaults if they fail to load.
     private func reloadPetSettings() async {
+        myEntitlement = try? await backend.fetchMyEntitlement()
         guard let pet else { return }
         remindersEnabled = (try? await backend.fetchRemindersEnabled(petID: pet.id)) ?? true
         hasPremium = (try? await backend.petHasPremium(petID: pet.id)) ?? false

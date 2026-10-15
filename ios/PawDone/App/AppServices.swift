@@ -6,6 +6,8 @@ struct AppServices {
     let session: SessionStore
     /// Nil until Config/Secrets.xcconfig is filled in.
     let petBackend: (any PetBackend)?
+    /// Nil until a RevenueCat key is set in Config/Secrets.xcconfig.
+    let subscriptions: (any SubscriptionService)?
 
     static func live() -> AppServices {
         #if DEBUG
@@ -25,7 +27,8 @@ struct AppServices {
                 backend: client.map { SupabaseSessionBackend(client: $0) },
                 deviceID: DeviceIdentity().id()
             ),
-            petBackend: client.map { SupabasePetBackend(client: $0) }
+            petBackend: client.map { SupabasePetBackend(client: $0) },
+            subscriptions: AppConfig.revenueCatAPIKey.map { RevenueCatSubscriptionService(apiKey: $0) }
         ).connectingPush()
     }
 

@@ -137,6 +137,17 @@ final class FakePetBackend: PetBackend {
         return occurrences[index]
     }
 
+    // MARK: Premium
+
+    var myEntitlement: MyEntitlement?
+    private(set) var syncCount = 0
+
+    func fetchMyEntitlement() async throws -> MyEntitlement? { myEntitlement }
+
+    func syncPremium() async throws {
+        syncCount += 1
+    }
+
     // MARK: Households
 
     var premiumPetIDs: Set<UUID> = []
