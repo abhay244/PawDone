@@ -72,9 +72,29 @@ Optional: the button only appears once the client IDs are set.
 2. In Supabase, go to **Authentication → Sign In / Providers → Google**: enable it, put both client IDs under **Client IDs** (web first, comma-separated), and turn on **Skip nonce check**.
 3. Add the three values to `ios/Config/Secrets.xcconfig` (see `Secrets.example.xcconfig`).
 
+## Payments (RevenueCat)
+
+Premium is an auto-renewing subscription sold through the App Store and managed by RevenueCat. The app reads plans from RevenueCat's current offering; Premium is RevenueCat's `premium` entitlement. The server keeps `public.entitlements` in sync two ways: the app calls `sync-premium` right after a purchase or restore, and RevenueCat calls `revenuecat-webhook` for every later change (renewal, cancellation, expiry, refund).
+
+**Product setup** (same IDs in the Test Store and App Store Connect):
+
+| Product ID | Length | India | Elsewhere |
+|---|---|---|---|
+| `com.abhaysingh.pawdone.premium.monthly` | 1 month | ₹199 | $3.99 |
+| `com.abhaysingh.pawdone.premium.quarterly` | 3 months | ₹499 | $9.99 |
+
+1. In RevenueCat, create the project and an entitlement with identifier `premium`.
+2. Add both products (to the **Test Store** for now), attach them to `premium`, and create an offering `default` (marked current) with packages **Monthly** and **Three Month**.
+3. Put the public SDK key in `ios/Config/Secrets.xcconfig` as `REVENUECAT_API_KEY`. The Test Store key (`test_…`) only works in debug builds; release builds ignore it, so it can't reach the App Store by accident.
+4. Create a **secret API key (V1)** and add it in Supabase (**Edge Functions → Secrets**) as `REVENUECAT_SECRET_KEY`.
+5. Make a random webhook password (`openssl rand -hex 32`). Add it in Supabase as `REVENUECAT_WEBHOOK_AUTH`, with the value `Bearer <password>`.
+6. In RevenueCat → **Integrations → Webhooks**, add `https://YOUR-PROJECT-REF.supabase.co/functions/v1/revenuecat-webhook` with authorization header value `Bearer <password>`.
+
+**Before release:** sign the Paid Apps agreement in App Store Connect, create a subscription group with the two products above, connect the App Store app in RevenueCat, attach the App Store products to the same entitlement and offering, and switch `REVENUECAT_API_KEY` to the `appl_…` key.
+
 ## Households and testing Premium
 
-Helpers join with an 8-character invite code from the owner's **Account → Family & helpers**. Inviting needs Premium. Until payments are built, give a test account Premium in the **SQL Editor**:
+Helpers join with an 8-character invite code from the owner's **Account → Family & helpers**. Inviting needs Premium. To give a test account Premium without buying it, run this in the **SQL Editor** (a later purchase or webhook overwrites it):
 
 ```sql
 insert into public.entitlements (user_id, is_premium, expires_at)
@@ -91,7 +111,7 @@ This needs an Apple Developer Program membership. In Xcode, open **PawDone targe
 ## Tests
 
 - **Database:** `supabase/tests/run.sh` runs the migrations and behaviour tests against a throwaway Postgres in Docker.
-- **Push sending:** `node --test supabase/tests/` tests the APNs signing and request code.
+- **Edge Functions:** `node --test supabase/tests/` tests the APNs signing and RevenueCat sync code.
 - **App:** press ⌘U in Xcode, or:
   ```bash
   cd ios && xcodebuild test -project PawDone.xcodeproj -scheme PawDone -destination 'platform=iOS Simulator,name=iPhone 17'

@@ -146,6 +146,22 @@ final class SupabasePetBackend: PetBackend {
             .value
     }
 
+    // MARK: Premium
+
+    func fetchMyEntitlement() async throws -> MyEntitlement? {
+        guard let userID = currentUserID else { return nil }
+        let rows: [MyEntitlement] = try await client.from("entitlements")
+            .select("is_premium,product_id,expires_at")
+            .eq("user_id", value: userID.uuidString)
+            .execute()
+            .value
+        return rows.first
+    }
+
+    func syncPremium() async throws {
+        try await client.functions.invoke("sync-premium")
+    }
+
     // MARK: Households
 
     func petHasPremium(petID: UUID) async throws -> Bool {

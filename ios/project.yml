@@ -23,6 +23,9 @@ packages:
   GoogleSignIn:
     url: https://github.com/google/GoogleSignIn-iOS
     from: 10.0.0
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios-spm
+    from: 5.95.0
 
 targets:
   PawDone:
@@ -52,6 +55,7 @@ targets:
         NSCameraUsageDescription: PawDone uses the camera to take photo proof that your pet's care was done.
         SUPABASE_HOST: $(SUPABASE_HOST)
         SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
+        REVENUECAT_API_KEY: $(REVENUECAT_API_KEY)
         GIDClientID: $(GOOGLE_IOS_CLIENT_ID)
         GIDServerClientID: $(GOOGLE_WEB_CLIENT_ID)
         CFBundleURLTypes:
@@ -68,6 +72,8 @@ targets:
         product: GoogleSignIn
       - package: GoogleSignIn
         product: GoogleSignInSwift
+      - package: RevenueCat
+        product: RevenueCat
     scheme:
       testTargets: [PawDoneTests]
 

@@ -58,6 +58,37 @@ nonisolated struct Membership: Decodable, Identifiable, Equatable, Sendable {
     }
 }
 
+/// The user's own Premium subscription, as recorded by the server.
+nonisolated struct MyEntitlement: Decodable, Equatable, Sendable {
+    let isPremium: Bool
+    let productID: String?
+    /// Nil for subscriptions that never expire.
+    let expiresAt: Date?
+
+    func isActive(at now: Date) -> Bool {
+        isPremium && (expiresAt.map { $0 > now } ?? true)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case isPremium = "is_premium"
+        case productID = "product_id"
+        case expiresAt = "expires_at"
+    }
+
+    init(isPremium: Bool, productID: String?, expiresAt: Date?) {
+        self.isPremium = isPremium
+        self.productID = productID
+        self.expiresAt = expiresAt
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isPremium = try container.decode(Bool.self, forKey: .isPremium)
+        productID = try container.decodeIfPresent(String.self, forKey: .productID)
+        expiresAt = try container.decodeServerDateIfPresent(forKey: .expiresAt)
+    }
+}
+
 nonisolated enum InviteCode {
     /// As typed by people: upper case, letters and digits only.
     static func normalize(_ input: String) -> String {

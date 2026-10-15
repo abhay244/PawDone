@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftUI
 
 struct AccountView: View {
@@ -13,13 +14,15 @@ struct AccountView: View {
     @State private var removingMember: UUID?
     @State private var leaving: Membership?
     @State private var isJoining = false
-    @State private var isShowingPremiumNeeded = false
+    @State private var isShowingPaywall = false
+    @State private var isManagingSubscription = false
 
     var body: some View {
         NavigationStack {
             Form {
                 petSection
                 householdSection
+                premiumSection
                 notificationsSection
                 nameSection
                 otherHouseholdsSection
@@ -60,10 +63,13 @@ struct AccountView: View {
             } message: {
                 Text("You'll need a new invite code to join again.")
             }
-            .alert("Premium needed", isPresented: $isShowingPremiumNeeded) {
-                Button("OK") {}
-            } message: {
-                Text("Inviting family and helpers is part of Premium.")
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView()
+            }
+            .manageSubscriptionsSheet(isPresented: $isManagingSubscription)
+            .onChange(of: isManagingSubscription) { _, isOpen in
+                // Pick up a cancellation or plan change made in the sheet.
+                if !isOpen { Task { await store.refreshPremium() } }
             }
             .alert("Something went wrong", isPresented: isShowingError) {
                 Button("OK") {}
@@ -144,6 +150,30 @@ struct AccountView: View {
                 } footer: {
                     Text("You help with \(pet.name). Only \(membership.ownerName) can change the schedule.")
                 }
+            }
+        }
+    }
+
+    private var premiumSection: some View {
+        Section {
+            if store.iHavePremium {
+                LabeledContent("PawDone Premium", value: "Active")
+                if let expiresAt = store.myEntitlement?.expiresAt {
+                    LabeledContent("Renews or ends", value: expiresAt.formatted(date: .abbreviated, time: .omitted))
+                }
+                Button("Manage subscription") { isManagingSubscription = true }
+            } else {
+                Button {
+                    isShowingPaywall = true
+                } label: {
+                    Label("Get PawDone Premium", systemImage: "star.fill")
+                }
+            }
+        } header: {
+            Text("Premium")
+        } footer: {
+            if !store.iHavePremium {
+                Text("Invite family and helpers, share photo proof and use PawDone on all your devices.")
             }
         }
     }
@@ -266,7 +296,7 @@ struct AccountView: View {
 
     private func startInvite() {
         guard store.hasPremium else {
-            isShowingPremiumNeeded = true
+            isShowingPaywall = true
             return
         }
         perform { shownInvite = try await store.createInvite() }
