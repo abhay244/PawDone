@@ -169,7 +169,7 @@ do $$ begin
 end $$;
 select tests.expect_error(
   format('select public.accept_invite(%L)', tests.var('invite1')),
-  'This invite link is invalid or has expired');
+  'This invite code is invalid or has expired');
 select tests.expect_error(
   format($$insert into public.tasks (pet_id, title, category, time_of_day) values (%L, 'Extra', 'food', '10:00')$$, tests.var('pet')),
   'new row violates row-level security policy%');

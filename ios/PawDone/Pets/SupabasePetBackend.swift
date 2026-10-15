@@ -132,9 +132,9 @@ final class SupabasePetBackend: PetBackend {
             .value
     }
 
-    func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence {
+    func completeOccurrence(id: UUID, note: String?, photoPath: String?) async throws -> Occurrence {
         try await client
-            .rpc("complete_occurrence", params: CompleteParams(occurrenceID: id, note: note))
+            .rpc("complete_occurrence", params: CompleteParams(occurrenceID: id, note: note, photoPath: photoPath))
             .execute()
             .value
     }
@@ -144,6 +144,93 @@ final class SupabasePetBackend: PetBackend {
             .rpc("undo_occurrence", params: ["p_occurrence_id": id.uuidString])
             .execute()
             .value
+    }
+
+    // MARK: Households
+
+    func petHasPremium(petID: UUID) async throws -> Bool {
+        try await client.rpc("pet_has_premium", params: ["p_pet_id": petID.uuidString]).execute().value
+    }
+
+    func fetchInvites() async throws -> [Invite] {
+        guard let userID = currentUserID else { return [] }
+        return try await client.from("invites")
+            .select("id,token,expires_at")
+            .eq("owner_id", value: userID.uuidString)
+            .is("accepted_at", value: nil)
+            .gt("expires_at", value: Date.now.ISO8601Format())
+            .order("created_at")
+            .execute()
+            .value
+    }
+
+    func createInvite() async throws -> Invite {
+        try await client.rpc("create_invite").execute().value
+    }
+
+    func cancelInvite(id: UUID) async throws {
+        try await client.from("invites").delete(returning: .minimal).eq("id", value: id.uuidString).execute()
+    }
+
+    func inviteDetails(code: String) async throws -> InvitePreview? {
+        let previews: [InvitePreview] = try await client
+            .rpc("invite_details", params: ["p_code": code])
+            .execute()
+            .value
+        return previews.first
+    }
+
+    func acceptInvite(code: String) async throws -> UUID {
+        try await client.rpc("accept_invite", params: ["p_token": code]).execute().value
+    }
+
+    func fetchMemberIDs() async throws -> [UUID] {
+        guard let userID = currentUserID else { return [] }
+        let rows: [MemberRow] = try await client.from("household_members")
+            .select("member_id")
+            .eq("owner_id", value: userID.uuidString)
+            .order("joined_at")
+            .execute()
+            .value
+        return rows.map(\.memberID)
+    }
+
+    func removeMember(_ memberID: UUID) async throws {
+        guard let userID = currentUserID else { throw NotSignedIn() }
+        try await client.from("household_members")
+            .delete(returning: .minimal)
+            .eq("owner_id", value: userID.uuidString)
+            .eq("member_id", value: memberID.uuidString)
+            .execute()
+    }
+
+    func fetchMemberships() async throws -> [Membership] {
+        try await client.rpc("my_households").execute().value
+    }
+
+    func leaveHousehold(ownerID: UUID) async throws {
+        guard let userID = currentUserID else { throw NotSignedIn() }
+        try await client.from("household_members")
+            .delete(returning: .minimal)
+            .eq("owner_id", value: ownerID.uuidString)
+            .eq("member_id", value: userID.uuidString)
+            .execute()
+    }
+
+    // MARK: Photo proof in the cloud
+
+    private var photos: StorageFileApi { client.storage.from("proof-photos") }
+
+    func uploadPhoto(_ data: Data, path: String) async throws {
+        _ = try await photos.upload(path, data: data, options: FileOptions(contentType: "image/jpeg", upsert: true))
+    }
+
+    func downloadPhoto(path: String) async throws -> Data {
+        try await photos.download(path: path)
+    }
+
+    func deletePhoto(path: String) async throws {
+        _ = try await photos.remove(paths: [path])
     }
 }
 
@@ -190,13 +277,24 @@ nonisolated private struct NotificationPreference: Codable {
     }
 }
 
+// Nil values are left out, so the function's defaults (null) apply.
 nonisolated private struct CompleteParams: Encodable {
     let occurrenceID: UUID
     let note: String?
+    let photoPath: String?
 
     enum CodingKeys: String, CodingKey {
         case occurrenceID = "p_occurrence_id"
         case note = "p_note"
+        case photoPath = "p_photo_path"
+    }
+}
+
+nonisolated private struct MemberRow: Decodable {
+    let memberID: UUID
+
+    enum CodingKeys: String, CodingKey {
+        case memberID = "member_id"
     }
 }
 

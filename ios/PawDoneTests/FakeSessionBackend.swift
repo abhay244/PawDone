@@ -21,7 +21,15 @@ final class FakeSessionBackend: SessionBackend {
         hasSession = true
     }
 
-    func saveProfileName(_ name: String) async throws {
+    private(set) var googleSignIns: [(idToken: String, accessToken: String)] = []
+
+    func signInWithGoogle(idToken: String, accessToken: String) async throws {
+        if let signInError { throw signInError }
+        googleSignIns.append((idToken, accessToken))
+        hasSession = true
+    }
+
+    func saveProfileNameIfMissing(_ name: String) async throws {
         savedName = name
     }
 

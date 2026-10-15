@@ -29,6 +29,32 @@ protocol PetBackend: AnyObject {
     func fetchOccurrences(petID: UUID, date: String) async throws -> [Occurrence]
     /// The pet's tasks for a range of days (`yyyy-MM-dd`, inclusive), in time order.
     func fetchOccurrences(petID: UUID, from: String, to: String) async throws -> [Occurrence]
-    func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence
+    /// `photoPath` is a Storage path for Premium households; Free plans keep photos on the phone.
+    func completeOccurrence(id: UUID, note: String?, photoPath: String?) async throws -> Occurrence
     func undoOccurrence(id: UUID) async throws -> Occurrence
+
+    // MARK: Households
+
+    /// Whether the pet's household has Premium (sharing and cloud photos).
+    func petHasPremium(petID: UUID) async throws -> Bool
+    /// Open invites to the user's own household.
+    func fetchInvites() async throws -> [Invite]
+    func createInvite() async throws -> Invite
+    func cancelInvite(id: UUID) async throws
+    /// Nil when the code can't be used.
+    func inviteDetails(code: String) async throws -> InvitePreview?
+    /// Joins the household and returns its owner.
+    func acceptInvite(code: String) async throws -> UUID
+    /// Helpers in the user's own household.
+    func fetchMemberIDs() async throws -> [UUID]
+    func removeMember(_ memberID: UUID) async throws
+    /// Households the user helps in.
+    func fetchMemberships() async throws -> [Membership]
+    func leaveHousehold(ownerID: UUID) async throws
+
+    // MARK: Photo proof in the cloud (Premium)
+
+    func uploadPhoto(_ data: Data, path: String) async throws
+    func downloadPhoto(path: String) async throws -> Data
+    func deletePhoto(path: String) async throws
 }

@@ -1,4 +1,6 @@
 import AuthenticationServices
+import GoogleSignIn
+import GoogleSignInSwift
 import SwiftUI
 
 struct SignInView: View {
@@ -51,9 +53,49 @@ struct SignInView: View {
             .frame(height: 52)
             .disabled(session.state == .notConfigured || session.isWorking)
             .opacity(session.state == .notConfigured || session.isWorking ? 0.5 : 1)
+
+            if AppConfig.isGoogleSignInConfigured && session.state != .notConfigured {
+                GoogleSignInButton(scheme: colorScheme == .dark ? .dark : .light, style: .wide, action: signInWithGoogle)
+                    .disabled(session.isWorking)
+                    .padding(.top, 12)
+            }
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
+    }
+
+    private func signInWithGoogle() {
+        guard let presenter = Self.topViewController() else { return }
+        Task {
+            do {
+                let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: presenter)
+                guard let idToken = result.user.idToken?.tokenString else {
+                    session.showSignInError("Couldn't sign in with Google. Try again.")
+                    return
+                }
+                await session.signInWithGoogle(
+                    idToken: idToken,
+                    accessToken: result.user.accessToken.tokenString,
+                    fullName: result.user.profile?.name
+                )
+            } catch {
+                if (error as? GIDSignInError)?.code == .canceled { return }
+                session.showSignInError("Couldn't sign in with Google. Try again.")
+            }
+        }
+    }
+
+    /// Google's sign-in sheet needs a UIKit view controller to present from.
+    private static func topViewController() -> UIViewController? {
+        let window = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)
+        var top = window?.rootViewController
+        while let presented = top?.presentedViewController {
+            top = presented
+        }
+        return top
     }
 
     private func handle(_ result: Result<ASAuthorization, Error>) {

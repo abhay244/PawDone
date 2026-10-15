@@ -1,4 +1,5 @@
 import Foundation
+import GoogleSignIn
 import Supabase
 
 final class SupabaseSessionBackend: SessionBackend {
@@ -18,11 +19,18 @@ final class SupabaseSessionBackend: SessionBackend {
         )
     }
 
-    func saveProfileName(_ name: String) async throws {
+    func signInWithGoogle(idToken: String, accessToken: String) async throws {
+        try await client.auth.signInWithIdToken(
+            credentials: OpenIDConnectCredentials(provider: .google, idToken: idToken, accessToken: accessToken)
+        )
+    }
+
+    func saveProfileNameIfMissing(_ name: String) async throws {
         guard let userID = client.auth.currentUser?.id else { return }
         try await client.from("profiles")
-            .update(["name": name])
+            .update(["name": name], returning: .minimal)
             .eq("id", value: userID.uuidString)
+            .eq("name", value: "")
             .execute()
     }
 
@@ -56,6 +64,8 @@ final class SupabaseSessionBackend: SessionBackend {
 
     func signOut() async {
         try? await client.auth.signOut(scope: .local)
+        // Forget the Google account too, so the next sign-in can pick a different one.
+        GIDSignIn.sharedInstance.signOut()
     }
 
     func sessionEndedEvents() -> AsyncStream<Void> {
