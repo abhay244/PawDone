@@ -110,14 +110,18 @@ final class FakePetBackend: PetBackend {
         return occurrences.filter { $0.petID == petID && (from...to).contains($0.date) }
     }
 
-    func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence {
+    private(set) var completedPhotoPaths: [String?] = []
+
+    func completeOccurrence(id: UUID, note: String?, photoPath: String?) async throws -> Occurrence {
         try checkFailure()
         completedNotes.append(note)
+        completedPhotoPaths.append(photoPath)
         let index = occurrences.firstIndex { $0.id == id }!
         occurrences[index].status = .done
         occurrences[index].completedBy = currentUserID
         occurrences[index].completedAt = .now
         occurrences[index].note = note
+        occurrences[index].photoPath = photoPath
         var returned = occurrences[index]
         returned.instructions = nil // The RPC doesn't include the task's instructions.
         return returned
@@ -129,7 +133,83 @@ final class FakePetBackend: PetBackend {
         occurrences[index].completedBy = nil
         occurrences[index].completedAt = nil
         occurrences[index].note = nil
+        occurrences[index].photoPath = nil
         return occurrences[index]
+    }
+
+    // MARK: Households
+
+    var premiumPetIDs: Set<UUID> = []
+    var invites: [Invite] = []
+    var invitePreviews: [String: InvitePreview] = [:]
+    /// Code → the pet that joining makes visible.
+    var invitePets: [String: Pet] = [:]
+    var memberIDs: [UUID] = []
+    var memberships: [Membership] = []
+    private(set) var acceptedCodes: [String] = []
+    private(set) var leftOwnerIDs: [UUID] = []
+
+    func petHasPremium(petID: UUID) async throws -> Bool {
+        premiumPetIDs.contains(petID)
+    }
+
+    func fetchInvites() async throws -> [Invite] { invites }
+
+    func createInvite() async throws -> Invite {
+        try checkFailure()
+        let invite = Invite(id: UUID(), code: "K7P2QX9M", expiresAt: .now.addingTimeInterval(7 * 86_400))
+        invites.append(invite)
+        return invite
+    }
+
+    func cancelInvite(id: UUID) async throws {
+        invites.removeAll { $0.id == id }
+    }
+
+    func inviteDetails(code: String) async throws -> InvitePreview? {
+        invitePreviews[code]
+    }
+
+    func acceptInvite(code: String) async throws -> UUID {
+        try checkFailure()
+        acceptedCodes.append(code)
+        guard let pet = invitePets[code] else { throw Failure() }
+        pets.append(pet)
+        memberships.append(Membership(ownerID: pet.ownerID, ownerName: "Asha", petID: pet.id, petName: pet.name, active: true))
+        return pet.ownerID
+    }
+
+    func fetchMemberIDs() async throws -> [UUID] { memberIDs }
+
+    func removeMember(_ memberID: UUID) async throws {
+        memberIDs.removeAll { $0 == memberID }
+    }
+
+    func fetchMemberships() async throws -> [Membership] { memberships }
+
+    func leaveHousehold(ownerID: UUID) async throws {
+        leftOwnerIDs.append(ownerID)
+        memberships.removeAll { $0.ownerID == ownerID }
+        pets.removeAll { $0.ownerID == ownerID }
+    }
+
+    // MARK: Cloud photos
+
+    var cloudPhotos: [String: Data] = [:]
+    var failUploads = false
+
+    func uploadPhoto(_ data: Data, path: String) async throws {
+        if failUploads { throw Failure() }
+        cloudPhotos[path] = data
+    }
+
+    func downloadPhoto(path: String) async throws -> Data {
+        guard let data = cloudPhotos[path] else { throw Failure() }
+        return data
+    }
+
+    func deletePhoto(path: String) async throws {
+        cloudPhotos[path] = nil
     }
 }
 

@@ -4,7 +4,7 @@ create schema tests;
 grant usage on schema tests to anon, authenticated, service_role;
 
 create table tests.vars (key text primary key, value text not null);
-grant all on tests.vars to authenticated, service_role;
+grant all on tests.vars to anon, authenticated, service_role;
 
 create function tests.var(p_key text) returns text language sql stable as $$
   select value from tests.vars where key = p_key;

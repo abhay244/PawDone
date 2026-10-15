@@ -153,11 +153,13 @@ Shows today's tasks for each pet, sorted by time. Each task has one status:
 - Visible to the owner and members.
 
 ### 4.9 Household & invites (Premium)
-- Owner taps **Invite** and shares a link via iMessage, WhatsApp, etc.
-- The link works once and expires after 7 days.
-- The person opening it installs the app if needed, signs in, and sees *"Join Sam's household?"* → **Accept**.
+- Owner taps **Invite someone** and shares an 8-character code (e.g. *K7P2 QX9M*) via iMessage, WhatsApp, etc. A tap-to-join link can come later, once there's a website.
+- The code works once and expires after 7 days. Case and spaces don't matter when typing it.
+- The helper installs the app, signs in, chooses **Join a household**, enters the code and sees *"Join Sam's household?"* → **Join**.
 - Up to 2 members per owner. Pending invites count toward the limit.
 - The owner can remove a member, and a member can leave at any time.
+- Someone who helps with other pets, or has their own, switches between them from Today or Account.
+- When the owner's Premium ends, helpers see the household as paused; it comes back when Premium is renewed.
 
 ---
 

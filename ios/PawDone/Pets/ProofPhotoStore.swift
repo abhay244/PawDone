@@ -10,12 +10,19 @@ struct ProofPhotoStore {
     /// Longest side after resizing, in pixels.
     static let maxDimension: CGFloat = 1600
 
+    /// A resized JPEG of the photo. Re-encoding drops the original metadata, including any location.
+    static func jpegData(for image: UIImage) -> Data? {
+        resized(image).jpegData(compressionQuality: 0.7)
+    }
+
     func save(_ image: UIImage, for occurrenceID: UUID) throws {
+        guard let data = Self.jpegData(for: image) else { throw CocoaError(.fileWriteUnknown) }
+        try save(data, for: occurrenceID)
+    }
+
+    /// Saves JPEG data as it is, e.g. a photo downloaded from the household's cloud storage.
+    func save(_ data: Data, for occurrenceID: UUID) throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        // Re-encoding drops the original metadata, including any location.
-        guard let data = Self.resized(image).jpegData(compressionQuality: 0.7) else {
-            throw CocoaError(.fileWriteUnknown)
-        }
         try data.write(to: url(for: occurrenceID), options: .atomic)
     }
 

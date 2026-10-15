@@ -20,6 +20,9 @@ packages:
   Supabase:
     url: https://github.com/supabase/supabase-swift
     from: 2.0.0
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: 10.0.0
 
 targets:
   PawDone:
@@ -49,6 +52,11 @@ targets:
         NSCameraUsageDescription: PawDone uses the camera to take photo proof that your pet's care was done.
         SUPABASE_HOST: $(SUPABASE_HOST)
         SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
+        GIDClientID: $(GOOGLE_IOS_CLIENT_ID)
+        GIDServerClientID: $(GOOGLE_WEB_CLIENT_ID)
+        CFBundleURLTypes:
+          - CFBundleURLName: Google sign-in
+            CFBundleURLSchemes: [$(GOOGLE_REVERSED_CLIENT_ID)]
     entitlements:
       path: Support/PawDone.entitlements
       properties:
@@ -56,6 +64,10 @@ targets:
         aps-environment: development
     dependencies:
       - package: Supabase
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: GoogleSignIn
+        product: GoogleSignInSwift
     scheme:
       testTargets: [PawDoneTests]
 

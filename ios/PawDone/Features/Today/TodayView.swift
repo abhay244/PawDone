@@ -37,6 +37,13 @@ struct TodayView: View {
                 }
             }
             .navigationTitle("Today")
+            .toolbar {
+                if store.pets.count > 1 {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        PetSwitcher()
+                    }
+                }
+            }
             .refreshable { await store.refreshToday() }
             .sheet(item: $completing) { MarkDoneSheet(occurrence: $0) }
             .sheet(item: $viewing) { OccurrenceDetailSheet(occurrence: $0) }
@@ -49,6 +56,29 @@ struct TodayView: View {
             completing = occurrence
         case .done, .missed:
             viewing = occurrence
+        }
+    }
+}
+
+/// Switches between the user's own pet and pets they help with.
+private struct PetSwitcher: View {
+    @Environment(PetStore.self) private var store
+
+    var body: some View {
+        Menu {
+            ForEach(store.pets) { pet in
+                Button {
+                    Task { await store.selectPet(pet) }
+                } label: {
+                    if let ownerName = store.ownerName(of: pet) {
+                        Label("\(pet.name) · \(ownerName)'s", systemImage: pet.species.symbol)
+                    } else {
+                        Label(pet.name, systemImage: pet.species.symbol)
+                    }
+                }
+            }
+        } label: {
+            Label("Switch pet", systemImage: "arrow.left.arrow.right")
         }
     }
 }
@@ -109,7 +139,7 @@ struct OccurrenceRow: View {
 
             Spacer()
 
-            if store.photos.hasPhoto(for: occurrence.id) {
+            if store.hasPhoto(occurrence) {
                 Image(systemName: "camera.fill")
                     .font(.caption)
                     .foregroundStyle(.secondary)

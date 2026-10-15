@@ -50,20 +50,33 @@ final class SessionStore {
     }
 
     func signInWithApple(idToken: String, nonce: String, fullName: String?) async {
+        await signIn(fullName: fullName) { backend in
+            try await backend.signInWithApple(idToken: idToken, nonce: nonce)
+        }
+    }
+
+    func signInWithGoogle(idToken: String, accessToken: String, fullName: String?) async {
+        await signIn(fullName: fullName) { backend in
+            try await backend.signInWithGoogle(idToken: idToken, accessToken: accessToken)
+        }
+    }
+
+    private func signIn(fullName: String?, using provider: (any SessionBackend) async throws -> Void) async {
         guard let backend else { return }
         isWorking = true
         errorMessage = nil
         defer { isWorking = false }
 
         do {
-            try await backend.signInWithApple(idToken: idToken, nonce: nonce)
+            try await provider(backend)
         } catch {
             errorMessage = "Couldn't sign in. Check your connection and try again."
             return
         }
         // Apple only shares the name on the first sign-in, so save it while we have it.
+        // Only fills an empty profile: never overwrites a name changed in the app.
         if let fullName, !fullName.isEmpty {
-            try? await backend.saveProfileName(fullName)
+            try? await backend.saveProfileNameIfMissing(fullName)
         }
         await registerDevice(force: false)
     }

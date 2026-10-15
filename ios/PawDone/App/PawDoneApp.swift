@@ -1,3 +1,4 @@
+import GoogleSignIn
 import SwiftUI
 
 @main
@@ -9,6 +10,8 @@ struct PawDoneApp: App {
         WindowGroup {
             RootView(petBackend: services.petBackend)
                 .environment(services.session)
+                // Google's sign-in returns to the app through this URL.
+                .onOpenURL { GIDSignIn.sharedInstance.handle($0) }
         }
     }
 }

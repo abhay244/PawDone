@@ -62,6 +62,28 @@ Reminders and "task done" alerts are sent by the `send-push` Edge Function, whic
 
 Check it's running in **Edge Functions → send-push → Logs**: there should be a run every minute.
 
+## Google sign-in
+
+Optional: the button only appears once the client IDs are set.
+
+1. In [Google Cloud Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials), configure the OAuth consent screen, then create two **OAuth client IDs**:
+   - **iOS**, with bundle ID `com.abhaysingh.pawdone`. Note its **Client ID** and **iOS URL scheme**.
+   - **Web application** (Supabase checks tokens against it). Note its **Client ID**.
+2. In Supabase, go to **Authentication → Sign In / Providers → Google**: enable it, put both client IDs under **Client IDs** (web first, comma-separated), and turn on **Skip nonce check**.
+3. Add the three values to `ios/Config/Secrets.xcconfig` (see `Secrets.example.xcconfig`).
+
+## Households and testing Premium
+
+Helpers join with an 8-character invite code from the owner's **Account → Family & helpers**. Inviting needs Premium. Until payments are built, give a test account Premium in the **SQL Editor**:
+
+```sql
+insert into public.entitlements (user_id, is_premium, expires_at)
+select id, true, now() + interval '1 year' from auth.users where email = 'you@example.com'
+on conflict (user_id) do update set is_premium = true, expires_at = excluded.expires_at;
+```
+
+Sign in with Apple accounts that hide their email have an `@privaterelay.appleid.com` address; find it under **Authentication → Users**.
+
 ## Sign in with Apple
 
 This needs an Apple Developer Program membership. In Xcode, open **PawDone target → Signing & Capabilities**, pick your team, and keep the Sign in with Apple capability. To test in the simulator, sign in to an Apple Account in the simulator's Settings app first.

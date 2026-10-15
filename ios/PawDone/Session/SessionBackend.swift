@@ -7,7 +7,8 @@ protocol SessionBackend: AnyObject {
     var hasSession: Bool { get }
 
     func signInWithApple(idToken: String, nonce: String) async throws
-    func saveProfileName(_ name: String) async throws
+    func signInWithGoogle(idToken: String, accessToken: String) async throws
+    func saveProfileNameIfMissing(_ name: String) async throws
 
     /// Activates this install for the account. See `register_device` in the database.
     func registerDevice(id: String, force: Bool) async throws -> DeviceRegistration

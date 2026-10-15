@@ -13,7 +13,7 @@ struct PetStoreTests {
 
     func makeStore() -> PetStore {
         let now = now
-        return PetStore(backend: backend, photos: photos, now: { now })
+        return PetStore(backend: backend, photos: photos, defaults: UserDefaults(suiteName: UUID().uuidString)!, now: { now })
     }
 
     // MARK: Loading

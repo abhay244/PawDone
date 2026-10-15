@@ -19,7 +19,8 @@ extension AppServices {
 private final class DemoSessionBackend: SessionBackend {
     var hasSession: Bool { true }
     func signInWithApple(idToken: String, nonce: String) async throws {}
-    func saveProfileName(_ name: String) async throws {}
+    func signInWithGoogle(idToken: String, accessToken: String) async throws {}
+    func saveProfileNameIfMissing(_ name: String) async throws {}
     func registerDevice(id: String, force: Bool) async throws -> DeviceRegistration { .registered }
     func deviceStatus(id: String) async throws -> DeviceStatus { .active }
     func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {}
@@ -38,7 +39,9 @@ private final class DemoPetBackend: PetBackend {
     func saveMyName(_ name: String) async throws { myName = name }
 
     func fetchProfileNames() async throws -> [UUID: String] {
-        currentUserID.map { [$0: myName] } ?? [:]
+        var names = [samID: "Sam", ashaID: "Asha"]
+        if let currentUserID { names[currentUserID] = myName }
+        return names
     }
 
     func fetchPets() async throws -> [Pet] { pets }
@@ -116,12 +119,13 @@ private final class DemoPetBackend: PetBackend {
         occurrences.filter { (from...to).contains($0.date) }.sorted { $0.scheduledAt < $1.scheduledAt }
     }
 
-    func completeOccurrence(id: UUID, note: String?) async throws -> Occurrence {
+    func completeOccurrence(id: UUID, note: String?, photoPath: String?) async throws -> Occurrence {
         guard let index = occurrences.firstIndex(where: { $0.id == id }) else { throw NotSignedIn() }
         occurrences[index].status = .done
         occurrences[index].completedBy = currentUserID
         occurrences[index].completedAt = .now
         occurrences[index].note = note
+        occurrences[index].photoPath = photoPath
         return occurrences[index]
     }
 
@@ -131,8 +135,60 @@ private final class DemoPetBackend: PetBackend {
         occurrences[index].completedBy = nil
         occurrences[index].completedAt = nil
         occurrences[index].note = nil
+        occurrences[index].photoPath = nil
         return occurrences[index]
     }
+
+    // MARK: Households: Premium, with Sam already helping. Any 8-character code joins
+    // Asha's household and its cat, Luna.
+
+    private let samID = UUID()
+    private let ashaID = UUID()
+    private lazy var memberIDs = [samID]
+    private var invites: [Invite] = []
+    private var memberships: [Membership] = []
+    private var cloudPhotos: [String: Data] = [:]
+
+    func petHasPremium(petID: UUID) async throws -> Bool { true }
+    func fetchInvites() async throws -> [Invite] { invites }
+
+    func createInvite() async throws -> Invite {
+        let code = String((0..<8).map { _ in "23456789ABCDEFGHJKLMNPQRSTUVWXYZ".randomElement()! })
+        let invite = Invite(id: UUID(), code: code, expiresAt: .now.addingTimeInterval(7 * 86_400))
+        invites.append(invite)
+        return invite
+    }
+
+    func cancelInvite(id: UUID) async throws { invites.removeAll { $0.id == id } }
+
+    func inviteDetails(code: String) async throws -> InvitePreview? {
+        code.count == 8 ? InvitePreview(ownerName: "Asha", petName: "Luna", petSpecies: .cat) : nil
+    }
+
+    func acceptInvite(code: String) async throws -> UUID {
+        let luna = Pet(id: UUID(), ownerID: ashaID, name: "Luna", species: .cat, timezone: TimeZone.current.identifier)
+        pets.append(luna)
+        memberships.append(Membership(ownerID: ashaID, ownerName: "Asha", petID: luna.id, petName: "Luna", active: true))
+        return ashaID
+    }
+
+    func fetchMemberIDs() async throws -> [UUID] { memberIDs }
+    func removeMember(_ memberID: UUID) async throws { memberIDs.removeAll { $0 == memberID } }
+    func fetchMemberships() async throws -> [Membership] { memberships }
+
+    func leaveHousehold(ownerID: UUID) async throws {
+        memberships.removeAll { $0.ownerID == ownerID }
+        pets.removeAll { $0.ownerID == ownerID }
+    }
+
+    func uploadPhoto(_ data: Data, path: String) async throws { cloudPhotos[path] = data }
+
+    func downloadPhoto(path: String) async throws -> Data {
+        guard let data = cloudPhotos[path] else { throw NotSignedIn() }
+        return data
+    }
+
+    func deletePhoto(path: String) async throws { cloudPhotos[path] = nil }
 
     /// An occurrence of a task, built the way the server would send it: pending today,
     /// or done or missed on a past day.

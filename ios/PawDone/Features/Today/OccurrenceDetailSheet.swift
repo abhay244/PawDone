@@ -7,6 +7,8 @@ struct OccurrenceDetailSheet: View {
 
     let occurrence: Occurrence
 
+    @State private var photo: UIImage?
+    @State private var isLoadingPhoto = false
     @State private var confirmingUndo = false
     @State private var isWorking = false
     @State private var errorMessage: String?
@@ -14,13 +16,18 @@ struct OccurrenceDetailSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                if let photo = store.photos.image(for: occurrence.id) {
+                if let photo {
                     Section {
                         Image(uiImage: photo)
                             .resizable()
                             .scaledToFit()
                             .frame(maxWidth: .infinity)
                             .clipShape(.rect(cornerRadius: 12))
+                    }
+                } else if isLoadingPhoto {
+                    Section {
+                        ProgressView("Loading photo…")
+                            .frame(maxWidth: .infinity)
                     }
                 }
 
@@ -56,6 +63,12 @@ struct OccurrenceDetailSheet: View {
             }
             .navigationTitle(occurrence.title)
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                guard store.hasPhoto(occurrence) else { return }
+                isLoadingPhoto = true
+                photo = await store.photo(for: occurrence)
+                isLoadingPhoto = false
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Close") { dismiss() }

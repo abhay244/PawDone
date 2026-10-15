@@ -67,6 +67,18 @@ struct SessionStoreTests {
         #expect(backend.savedName == "Sam Lee")
     }
 
+    @Test func googleSignInRegistersThisDevice() async {
+        let store = makeStore()
+        await store.start()
+        await store.signInWithGoogle(idToken: "id", accessToken: "access", fullName: "Sam Lee")
+
+        #expect(store.state == .signedIn)
+        #expect(backend.googleSignIns.map(\.idToken) == ["id"])
+        #expect(backend.googleSignIns.map(\.accessToken) == ["access"])
+        #expect(backend.registrations.map(\.force) == [false])
+        #expect(backend.savedName == "Sam Lee")
+    }
+
     @Test func signInFailureShowsError() async {
         backend.signInError = FakeSessionBackend.Failure()
         let store = makeStore()

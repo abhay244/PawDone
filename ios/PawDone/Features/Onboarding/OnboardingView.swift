@@ -86,11 +86,32 @@ private struct PetStep: View {
 
     @State private var model = PetFormModel()
     @State private var isSaving = false
+    @State private var isJoining = false
     @State private var errorMessage: String?
 
     var body: some View {
         Form {
+            ForEach(store.pausedMemberships) { membership in
+                Section {
+                    Text("You're in \(membership.ownerName)'s household, but their Premium has ended, so \(membership.petName ?? "their pet") is hidden for now.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section {
+                Button {
+                    isJoining = true
+                } label: {
+                    Label("Join someone's household instead", systemImage: "person.2")
+                }
+            } footer: {
+                Text("Helping with someone else's pet? Use the invite code they sent you.")
+            }
+
             PetFormSections(model: $model)
+        }
+        .sheet(isPresented: $isJoining) {
+            JoinHouseholdView()
         }
         .navigationTitle("Add your pet")
         .safeAreaInset(edge: .bottom) {
@@ -256,6 +277,9 @@ struct ContinueButton: View {
         .controlSize(.large)
         .disabled(!isEnabled)
         .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.vertical, 8)
+        // The form scrolls underneath, so keep the button on a bar.
+        .frame(maxWidth: .infinity)
+        .background(.bar)
     }
 }

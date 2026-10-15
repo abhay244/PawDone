@@ -54,7 +54,9 @@ struct MarkDoneSheet: View {
                 } header: {
                     Text("Photo proof")
                 } footer: {
-                    Text("Optional. Photos are kept on this phone.")
+                    Text(store.hasPremium
+                        ? "Optional. Everyone who looks after \(store.pet?.name ?? "your pet") can see it."
+                        : "Optional. Photos are kept on this phone.")
                 }
 
                 Section("Note") {
