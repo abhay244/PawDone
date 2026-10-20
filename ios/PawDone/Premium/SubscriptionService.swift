@@ -17,6 +17,27 @@ nonisolated struct PremiumPlan: Identifiable, Equatable, Sendable {
     let pricePerMonth: String?
 }
 
+nonisolated extension PremiumPlan.Period {
+    /// The plan length from a store product ID, e.g. "com.abhaysingh.pawdone.premium.quarterly".
+    init?(productID: String?) {
+        guard let id = productID?.lowercased() else { return nil }
+        if id.hasSuffix(".quarterly") || id.contains("3month") || id.contains("three") {
+            self = .threeMonths
+        } else if id.hasSuffix(".monthly") || id.contains("month") {
+            self = .monthly
+        } else {
+            return nil
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .monthly: "Monthly"
+        case .threeMonths: "3 months"
+        }
+    }
+}
+
 nonisolated enum PurchaseOutcome: Equatable, Sendable {
     /// `active` is whether Premium is now on.
     case purchased(active: Bool)

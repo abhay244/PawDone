@@ -60,16 +60,30 @@ struct SignedInView: View {
 }
 
 struct MainTabView: View {
+    enum Tab: Hashable {
+        case today, reports, schedule, premium, account
+    }
+
+    // Explicit, so the tab stays put when a tab's content changes (e.g. after buying Premium).
+    @State private var selection: Tab = .today
+
     var body: some View {
-        TabView {
+        TabView(selection: $selection) {
             TodayView()
                 .tabItem { Label("Today", systemImage: "checklist") }
+                .tag(Tab.today)
             ReportsView()
                 .tabItem { Label("Reports", systemImage: "chart.bar") }
+                .tag(Tab.reports)
             ScheduleView()
                 .tabItem { Label("Schedule", systemImage: "calendar") }
+                .tag(Tab.schedule)
+            PremiumTabView()
+                .tabItem { Label("Premium", systemImage: "star") }
+                .tag(Tab.premium)
             AccountView()
                 .tabItem { Label("Account", systemImage: "person.crop.circle") }
+                .tag(Tab.account)
         }
     }
 }

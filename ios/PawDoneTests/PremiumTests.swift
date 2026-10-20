@@ -105,6 +105,23 @@ struct PremiumStoreTests {
     }
 }
 
+struct PlanPeriodTests {
+    @Test(arguments: [
+        ("com.abhaysingh.pawdone.premium.monthly", PremiumPlan.Period?.some(.monthly)),
+        ("com.abhaysingh.pawdone.premium.quarterly", .some(.threeMonths)),
+        ("demo.monthly", .some(.monthly)),
+        ("lifetime", nil),
+    ])
+    func readsPlanFromProductID(productID: String, period: PremiumPlan.Period?) {
+        #expect(PremiumPlan.Period(productID: productID) == period)
+    }
+
+    @Test func noProductMeansNoPlan() {
+        #expect(PremiumPlan.Period(productID: nil) == nil)
+        #expect(PremiumPlan.Period.threeMonths.displayName == "3 months")
+    }
+}
+
 @MainActor
 struct MyPremiumTests {
     let now = ServerDate.parse("2026-10-16T10:00:00Z")!
