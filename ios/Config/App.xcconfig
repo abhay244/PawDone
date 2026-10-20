@@ -5,8 +5,10 @@
 SUPABASE_HOST =
 SUPABASE_ANON_KEY =
 
-// Premium purchases are unavailable until this is set.
+// Premium purchases are unavailable until these are set.
+// Xcode builds use REVENUECAT_API_KEY; TestFlight and App Store builds use REVENUECAT_APP_STORE_KEY.
 REVENUECAT_API_KEY =
+REVENUECAT_APP_STORE_KEY =
 
 // Google sign-in is hidden until these are set.
 GOOGLE_IOS_CLIENT_ID =
