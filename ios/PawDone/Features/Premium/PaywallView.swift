@@ -1,7 +1,13 @@
 import SwiftUI
 
 /// PawDone Premium: what it adds, the plans, and Apple's required subscription details.
+/// Shown as a sheet (with Close), or as the Premium tab for users without Premium.
 struct PaywallView: View {
+    /// False when shown as a tab: no Close button, and nothing to dismiss after buying.
+    var isSheet = true
+    /// Shown under the header, e.g. when the user already shares someone else's Premium.
+    var note: String?
+
     @Environment(PremiumStore.self) private var premium
     @Environment(PetStore.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -25,8 +31,10 @@ struct PaywallView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                if isSheet {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") { dismiss() }
+                    }
                 }
             }
             .task {
@@ -60,6 +68,13 @@ struct PaywallView: View {
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            if let note {
+                Label(note, systemImage: "checkmark.seal.fill")
+                    .font(.subheadline)
+                    .padding(12)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.accentColor.opacity(0.12), in: .rect(cornerRadius: 12))
+            }
         }
     }
 
@@ -180,11 +195,12 @@ struct PaywallView: View {
 
     private func finish() async {
         await store.refreshPremium()
-        dismiss()
+        // As a tab, the Premium tab switches to the subscriber view by itself.
+        if isSheet { dismiss() }
     }
 }
 
-private struct Benefit: View {
+struct Benefit: View {
     let symbol: String
     let title: String
     let detail: String
