@@ -43,6 +43,19 @@ final class FakeSessionBackend: SessionBackend {
         try deviceStatusResult.get()
     }
 
+    var signedInWithApple = false
+    var deleteAccountError: Error?
+    private(set) var deleteAccountCount = 0
+    private(set) var deletionAppleCodes: [String?] = []
+
+    func deleteAccount(appleAuthorizationCode: String?) async throws {
+        deleteAccountCount += 1
+        deletionAppleCodes.append(appleAuthorizationCode)
+        if let deleteAccountError { throw deleteAccountError }
+        // Like Supabase, the session ends once the user is gone.
+        revokeSession()
+    }
+
     /// Every push token sent, in order, with the session still signed in at the time.
     private(set) var pushTokens: [(token: String?, environment: String, signedIn: Bool)] = []
 

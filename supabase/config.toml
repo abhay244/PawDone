@@ -19,3 +19,8 @@ verify_jwt = false
 [functions.sync-premium]
 enabled = true
 verify_jwt = true
+
+# Called by the app when the user deletes their account, with their session.
+[functions.delete-account]
+enabled = true
+verify_jwt = true

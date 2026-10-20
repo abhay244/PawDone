@@ -20,11 +20,13 @@ enum AppConfig {
         return key
     }
 
-    /// Shown on the paywall. Apple's standard licence agreement, unless PawDone gets its own.
+    /// Apple's standard licence agreement, used as PawDone's terms of use.
     static let termsOfUseURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
-    /// Shown on the paywall. Apple requires one before submission; set it once the website exists.
-    static let privacyPolicyURL: URL? = nil
+    /// Published from site/ by .github/workflows/pages.yml.
+    static let privacyPolicyURL = URL(string: "https://abhay244.github.io/PawDone/privacy/")!
+    static let supportURL = URL(string: "https://abhay244.github.io/PawDone/support/")!
+    static let supportEmail = "abhayiitr5001@gmail.com"
 
     /// Google sign-in is offered only once its client IDs are set.
     static var isGoogleSignInConfigured: Bool {

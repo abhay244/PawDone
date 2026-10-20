@@ -5,6 +5,8 @@ import Foundation
 protocol SessionBackend: AnyObject {
     /// True when a signed-in session is stored on this device.
     var hasSession: Bool { get }
+    /// True when the signed-in user used Sign in with Apple.
+    var signedInWithApple: Bool { get }
 
     func signInWithApple(idToken: String, nonce: String) async throws
     func signInWithGoogle(idToken: String, accessToken: String) async throws
@@ -16,6 +18,10 @@ protocol SessionBackend: AnyObject {
 
     /// Saves this phone's push token, or clears it with nil. `environment` is "sandbox" or "production".
     func setPushToken(_ token: String?, deviceID: String, environment: String) async throws
+
+    /// Permanently deletes the signed-in user and all their data on the server.
+    /// `appleAuthorizationCode` lets the server revoke Sign in with Apple, as Apple requires.
+    func deleteAccount(appleAuthorizationCode: String?) async throws
 
     /// Signs out on this device only.
     func signOut() async

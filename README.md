@@ -92,6 +92,28 @@ Premium is an auto-renewing subscription sold through the App Store and managed 
 
 **Before release:** sign the Paid Apps agreement in App Store Connect, create a subscription group with the two products above, connect the App Store app in RevenueCat, attach the App Store products to the same entitlement and offering, and switch `REVENUECAT_API_KEY` to the `appl_…` key.
 
+## Website (privacy policy and support)
+
+`site/` holds the public pages: home, [privacy policy](https://abhay244.github.io/PawDone/privacy/) and [support](https://abhay244.github.io/PawDone/support/). The app links to them from Account, the paywall and the sign-in screen, and App Store Connect needs both URLs.
+
+- **Publishing:** `.github/workflows/pages.yml` publishes `site/` to GitHub Pages whenever it changes on `main`. One-time setup: repository **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- **Preview locally:**
+  ```bash
+  python3 -m http.server 8765 --directory site
+  ```
+- **Keep the privacy policy accurate:** update it whenever the app starts collecting new data or uses a new service.
+
+## Account deletion
+
+**Account → Delete account** calls the `delete-account` Edge Function. It removes the user's proof photos from Storage, deletes their RevenueCat customer data, then deletes the auth user, which cascades to everything they own. Tasks they marked done in other people's households stay, without their name or photo. It doesn't cancel App Store subscriptions; the screen warns subscribers to cancel first.
+
+For users who signed in with Apple, Apple requires revoking the Sign in with Apple authorization ([TN3194](https://developer.apple.com/documentation/technotes/tn3194-handling-account-deletions-and-revoking-tokens-for-sign-in-with-apple)). The app asks them to confirm with Apple, and the function revokes it. One-time setup:
+
+1. In [Certificates, Identifiers & Profiles → Keys](https://developer.apple.com/account/resources/authkeys/list), create a key with **Sign in with Apple** enabled. Configure it with primary App ID `com.abhaysingh.pawdone`, download the `.p8` and note its **Key ID**.
+2. In Supabase, go to **Edge Functions → Secrets** and add `APPLE_SIGNIN_KEY_ID` and `APPLE_SIGNIN_PRIVATE_KEY` (the whole `.p8` contents). The team ID comes from `APNS_TEAM_ID`.
+
+Without these the account is still deleted, and the function logs that Apple wasn't revoked.
+
 ## Households and testing Premium
 
 Helpers join with an 8-character invite code from the owner's **Account → Family & helpers**. Inviting needs Premium. To give a test account Premium without buying it, run this in the **SQL Editor** (a later purchase or webhook overwrites it):

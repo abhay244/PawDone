@@ -2,20 +2,9 @@
 // Plain JavaScript and Web APIs only, so it runs in Supabase Edge Functions (Deno) and
 // under Node for tests (supabase/tests/apns.test.mjs).
 
-const encoder = new TextEncoder();
+import { base64url, importPrivateKey, signJWT } from "../_shared/es256.mjs";
 
-export function base64url(bytes) {
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
-}
-
-/** Imports the contents of an AuthKey_XXXXXXXXXX.p8 file. */
-export async function importPrivateKey(pem) {
-  const body = pem.replace(/-----(BEGIN|END) PRIVATE KEY-----/g, "").replace(/\s+/g, "");
-  const der = Uint8Array.from(atob(body), (character) => character.charCodeAt(0));
-  return crypto.subtle.importKey("pkcs8", der, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
-}
+export { base64url, importPrivateKey };
 
 /**
  * Apple rejects provider tokens refreshed more often than every 20 minutes and accepts
@@ -27,13 +16,8 @@ export function issuedAt(nowSeconds = Math.floor(Date.now() / 1000)) {
 }
 
 /** The provider token (an ES256 JWT) sent as `authorization: bearer …`. */
-export async function providerToken({ key, keyId, teamId, iat = issuedAt() }) {
-  const header = base64url(encoder.encode(JSON.stringify({ alg: "ES256", kid: keyId })));
-  const claims = base64url(encoder.encode(JSON.stringify({ iss: teamId, iat })));
-  const signingInput = `${header}.${claims}`;
-  // WebCrypto returns the raw r‖s signature JWS expects for ES256.
-  const signature = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, encoder.encode(signingInput));
-  return `${signingInput}.${base64url(new Uint8Array(signature))}`;
+export function providerToken({ key, keyId, teamId, iat = issuedAt() }) {
+  return signJWT({ key, keyId, claims: { iss: teamId, iat } });
 }
 
 export function apnsHost(environment) {
