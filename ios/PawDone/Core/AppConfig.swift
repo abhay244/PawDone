@@ -10,14 +10,18 @@ enum AppConfig {
         value(for: "SUPABASE_ANON_KEY")
     }
 
-    /// RevenueCat public SDK key: `appl_…` for the App Store, `test_…` for RevenueCat's Test Store.
+    /// RevenueCat public SDK key.
+    /// - Xcode (debug) builds: `REVENUECAT_API_KEY`, usually the Test Store key (`test_…`).
+    /// - TestFlight and App Store (release) builds: `REVENUECAT_APP_STORE_KEY` (`appl_…`).
     static var revenueCatAPIKey: String? {
-        guard let key = value(for: "REVENUECAT_API_KEY") else { return nil }
-        #if !DEBUG
+        #if DEBUG
+        return value(for: "REVENUECAT_API_KEY")
+        #else
+        let key = value(for: "REVENUECAT_APP_STORE_KEY") ?? value(for: "REVENUECAT_API_KEY")
         // Never let a Test Store key reach TestFlight or the App Store.
-        if key.hasPrefix("test_") { return nil }
-        #endif
+        guard let key, !key.hasPrefix("test_") else { return nil }
         return key
+        #endif
     }
 
     /// Apple's standard licence agreement, used as PawDone's terms of use.
