@@ -62,6 +62,17 @@ final class SupabaseSessionBackend: SessionBackend {
             .execute()
     }
 
+    var signedInWithApple: Bool {
+        client.auth.currentUser?.identities?.contains { $0.provider == "apple" } ?? false
+    }
+
+    func deleteAccount(appleAuthorizationCode: String?) async throws {
+        try await client.functions.invoke(
+            "delete-account",
+            options: FunctionInvokeOptions(body: DeleteAccountBody(appleAuthorizationCode: appleAuthorizationCode))
+        )
+    }
+
     func signOut() async {
         try? await client.auth.signOut(scope: .local)
         // Forget the Google account too, so the next sign-in can pick a different one.
@@ -109,6 +120,14 @@ nonisolated private struct SetPushTokenParams: Encodable, Sendable {
         try container.encode(deviceID, forKey: .deviceID)
         try container.encode(token, forKey: .token)
         try container.encode(environment, forKey: .environment)
+    }
+}
+
+nonisolated private struct DeleteAccountBody: Encodable, Sendable {
+    let appleAuthorizationCode: String?
+
+    enum CodingKeys: String, CodingKey {
+        case appleAuthorizationCode = "apple_authorization_code"
     }
 }
 

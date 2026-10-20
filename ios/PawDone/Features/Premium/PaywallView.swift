@@ -125,9 +125,7 @@ struct PaywallView: View {
                 .multilineTextAlignment(.center)
             HStack(spacing: 16) {
                 Link("Terms of Use", destination: AppConfig.termsOfUseURL)
-                if let privacy = AppConfig.privacyPolicyURL {
-                    Link("Privacy Policy", destination: privacy)
-                }
+                Link("Privacy Policy", destination: AppConfig.privacyPolicyURL)
             }
             .font(.caption)
         }

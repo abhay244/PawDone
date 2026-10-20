@@ -56,6 +56,18 @@ export async function fetchSubscriber(appUserID, secretKey, fetchImpl = fetch) {
   return response.json();
 }
 
+/** Deletes a customer's data from RevenueCat (account deletion). Doesn't cancel App Store subscriptions. */
+export async function deleteSubscriber(appUserID, secretKey, fetchImpl = fetch) {
+  const response = await fetchImpl(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(appUserID)}`, {
+    method: "DELETE",
+    headers: { authorization: `Bearer ${secretKey}`, accept: "application/json" },
+  });
+  // 404: RevenueCat never saw this user, so there's nothing to delete.
+  if (!response.ok && response.status !== 404) {
+    throw new Error(`RevenueCat returned ${response.status} deleting ${appUserID}`);
+  }
+}
+
 /** The row to upsert into public.entitlements. */
 export function entitlementRow(userID, premium, now = new Date()) {
   return {

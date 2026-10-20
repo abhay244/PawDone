@@ -16,6 +16,7 @@ struct AccountView: View {
     @State private var isJoining = false
     @State private var isShowingPaywall = false
     @State private var isManagingSubscription = false
+    @State private var isDeletingAccount = false
 
     var body: some View {
         NavigationStack {
@@ -27,10 +28,33 @@ struct AccountView: View {
                 nameSection
                 otherHouseholdsSection
 
+                Section("Help & legal") {
+                    Link(destination: AppConfig.supportURL) {
+                        Label("Help & support", systemImage: "questionmark.circle")
+                    }
+                    if let contact = URL(string: "mailto:\(AppConfig.supportEmail)?subject=PawDone%20support") {
+                        Link(destination: contact) {
+                            Label("Contact us", systemImage: "envelope")
+                        }
+                    }
+                    Link(destination: AppConfig.privacyPolicyURL) {
+                        Label("Privacy Policy", systemImage: "hand.raised")
+                    }
+                    Link(destination: AppConfig.termsOfUseURL) {
+                        Label("Terms of Use", systemImage: "doc.text")
+                    }
+                }
+
                 Section {
                     Button("Sign out", role: .destructive) {
                         Task { await session.signOut() }
                     }
+                }
+
+                Section {
+                    Button("Delete account", role: .destructive) { isDeletingAccount = true }
+                } footer: {
+                    Text("Permanently deletes your account, your pet and its history.")
                 }
             }
             .navigationTitle("Account")
@@ -65,6 +89,9 @@ struct AccountView: View {
             }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
+            }
+            .sheet(isPresented: $isDeletingAccount) {
+                DeleteAccountView()
             }
             .manageSubscriptionsSheet(isPresented: $isManagingSubscription)
             .onChange(of: isManagingSubscription) { _, isOpen in

@@ -19,12 +19,14 @@ extension AppServices {
 
 private final class DemoSessionBackend: SessionBackend {
     var hasSession: Bool { true }
+    var signedInWithApple: Bool { false }
     func signInWithApple(idToken: String, nonce: String) async throws {}
     func signInWithGoogle(idToken: String, accessToken: String) async throws {}
     func saveProfileNameIfMissing(_ name: String) async throws {}
     func registerDevice(id: String, force: Bool) async throws -> DeviceRegistration { .registered }
     func deviceStatus(id: String) async throws -> DeviceStatus { .active }
     func setPushToken(_ token: String?, deviceID: String, environment: String) async throws {}
+    func deleteAccount(appleAuthorizationCode: String?) async throws { try await Task.sleep(for: .seconds(1)) }
     func signOut() async {}
     func sessionEndedEvents() -> AsyncStream<Void> { AsyncStream { _ in } }
 }

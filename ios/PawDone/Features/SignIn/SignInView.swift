@@ -33,6 +33,12 @@ struct SignInView: View {
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
                     .padding(.bottom, 12)
+            } else if let notice = session.notice {
+                Label(notice, systemImage: "checkmark.circle")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 12)
             }
             if session.state == .notConfigured {
                 Text("Sign-in isn't set up yet. Add your Supabase details to Config/Secrets.xcconfig.")
@@ -59,10 +65,23 @@ struct SignInView: View {
                     .disabled(session.isWorking)
                     .padding(.top, 12)
             }
+
+            Text(Self.legalNote)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 16)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
     }
+
+    /// "By continuing, you agree to the Terms of Use and Privacy Policy", with both as links.
+    private static let legalNote: AttributedString = {
+        let markdown = "By continuing, you agree to the [Terms of Use](\(AppConfig.termsOfUseURL.absoluteString)) "
+            + "and [Privacy Policy](\(AppConfig.privacyPolicyURL.absoluteString))."
+        return (try? AttributedString(markdown: markdown)) ?? AttributedString("By continuing, you agree to the Terms of Use and Privacy Policy.")
+    }()
 
     private func signInWithGoogle() {
         guard let presenter = Self.topViewController() else { return }

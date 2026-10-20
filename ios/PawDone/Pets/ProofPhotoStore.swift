@@ -38,6 +38,11 @@ struct ProofPhotoStore {
         try? FileManager.default.removeItem(at: url(for: occurrenceID))
     }
 
+    /// Removes every photo on this phone, e.g. after deleting the account.
+    func deleteAll() {
+        try? FileManager.default.removeItem(at: directory)
+    }
+
     private func url(for occurrenceID: UUID) -> URL {
         directory.appending(path: "\(occurrenceID.uuidString.lowercased()).jpg")
     }

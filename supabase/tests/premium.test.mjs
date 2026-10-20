@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   affectedUserIDs,
   authorizationMatches,
+  deleteSubscriber,
   entitlementRow,
   fetchSubscriber,
   premiumFromSubscriber,
@@ -94,6 +95,20 @@ test("fetches the subscriber with the secret key", async () => {
   assert.equal(request.init.headers.authorization, "Bearer sk_test");
 
   await assert.rejects(fetchSubscriber(ASHA, "sk_test", async () => new Response("", { status: 500 })));
+});
+
+test("deletes the RevenueCat customer; unknown customers are fine", async () => {
+  let request;
+  await deleteSubscriber(ASHA, "sk_test", async (url, init) => {
+    request = { url, init };
+    return new Response("{}", { status: 200 });
+  });
+  assert.equal(request.url, `https://api.revenuecat.com/v1/subscribers/${ASHA}`);
+  assert.equal(request.init.method, "DELETE");
+  assert.equal(request.init.headers.authorization, "Bearer sk_test");
+
+  await deleteSubscriber(ASHA, "sk_test", async () => new Response("", { status: 404 }));
+  await assert.rejects(deleteSubscriber(ASHA, "sk_test", async () => new Response("", { status: 500 })));
 });
 
 test("webhook authorization must match exactly", () => {

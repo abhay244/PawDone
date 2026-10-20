@@ -19,18 +19,27 @@ final class SessionStore {
     private(set) var state: State = .loading
     private(set) var isWorking = false
     private(set) var errorMessage: String?
+    /// Shown on the sign-in screen, e.g. after the account was deleted.
+    private(set) var notice: String?
 
     @ObservationIgnored private let backend: (any SessionBackend)?
     @ObservationIgnored private let deviceID: String
     @ObservationIgnored private let pushEnvironment: String
+    @ObservationIgnored private let eraseLocalData: @MainActor () -> Void
     @ObservationIgnored private var isEndingSession = false
     @ObservationIgnored private var isVerifyingDevice = false
     @ObservationIgnored private var sessionEndedTask: Task<Void, Never>?
 
-    init(backend: (any SessionBackend)?, deviceID: String, pushEnvironment: String = PushRegistrar.environment) {
+    init(
+        backend: (any SessionBackend)?,
+        deviceID: String,
+        pushEnvironment: String = PushRegistrar.environment,
+        eraseLocalData: @escaping @MainActor () -> Void = LocalData.erase
+    ) {
         self.backend = backend
         self.deviceID = deviceID
         self.pushEnvironment = pushEnvironment
+        self.eraseLocalData = eraseLocalData
     }
 
     func start() async {
@@ -65,6 +74,7 @@ final class SessionStore {
         guard let backend else { return }
         isWorking = true
         errorMessage = nil
+        notice = nil
         defer { isWorking = false }
 
         do {
@@ -99,6 +109,28 @@ final class SessionStore {
         // Stop notifications to this phone. Best effort: signing out shouldn't fail offline.
         try? await backend?.setPushToken(nil, deviceID: deviceID, environment: pushEnvironment)
         await endSession(then: .signedOut)
+    }
+
+    /// Whether deleting the account needs a fresh Sign in with Apple authorization first.
+    var deletionNeedsAppleAuthorization: Bool { backend?.signedInWithApple ?? false }
+
+    /// Permanently deletes the account and everything stored for it, then signs out.
+    /// Throws if the server couldn't delete it; the user then stays signed in.
+    func deleteAccount(appleAuthorizationCode: String? = nil) async throws {
+        guard let backend else { return }
+        isWorking = true
+        // The server ends the session as part of deleting the user; that isn't "signed in elsewhere".
+        isEndingSession = true
+        defer {
+            isWorking = false
+            isEndingSession = false
+        }
+
+        try await backend.deleteAccount(appleAuthorizationCode: appleAuthorizationCode)
+        eraseLocalData()
+        await backend.signOut()
+        notice = "Your account and its data have been deleted."
+        state = .signedOut
     }
 
     /// Saves this phone's push token for the signed-in account.

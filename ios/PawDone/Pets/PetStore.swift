@@ -44,7 +44,7 @@ final class PetStore {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let currentDate: () -> Date
 
-    private static let selectedPetKey = "selectedPetID"
+    static let selectedPetKey = "selectedPetID"
 
     init(
         backend: any PetBackend,
