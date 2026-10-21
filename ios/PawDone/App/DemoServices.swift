@@ -4,16 +4,18 @@ import Foundation
 // Demo mode: launch with `-PawDoneDemo` to use the app signed in, with in-memory data and
 // no server. For checking screens in the simulator, where Sign in with Apple is unreliable.
 // Launch with `-PawDoneScreenshots` instead to skip setup and start with a lived-in account,
-// for App Store screenshots (see docs/APP_STORE.md). Debug builds only.
+// for App Store screenshots (see docs/APP_STORE.md). Add `-PawDoneFreePlan` to start that
+// account without Premium, to show the paywall. Debug builds only.
 
 extension AppServices {
     static var isDemo: Bool { isScreenshotDemo || ProcessInfo.processInfo.arguments.contains("-PawDoneDemo") }
     static var isScreenshotDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneScreenshots") }
+    static var isFreePlanDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneFreePlan") }
 
     static func demo() -> AppServices {
         AppServices(
             session: SessionStore(backend: DemoSessionBackend(), deviceID: "demo-device"),
-            petBackend: DemoPetBackend(seeded: isScreenshotDemo),
+            petBackend: DemoPetBackend(seeded: isScreenshotDemo, freePlan: isFreePlanDemo),
             subscriptions: DemoSubscriptionService()
         )
     }
@@ -59,16 +61,16 @@ private final class DemoPetBackend: PetBackend {
     private var tasks: [PetTask] = []
     private var occurrences: [Occurrence] = []
 
-    init(seeded: Bool) {
-        if seeded { seedForScreenshots() }
+    init(seeded: Bool, freePlan: Bool) {
+        if seeded { seedForScreenshots(freePlan: freePlan) }
     }
 
-    /// Maya's dog Bruno, with Premium and two helpers. Today's tasks up to now are done,
-    /// shared between the three of them; the rest are still to do.
-    private func seedForScreenshots() {
+    /// Maya's dog Bruno, with Premium and two helpers (or on the Free plan, on her own).
+    /// Today's tasks up to now are done, shared between the household; the rest are still to do.
+    private func seedForScreenshots(freePlan: Bool) {
         myName = "Maya"
-        hasPremium = true
-        memberIDs = [samID, ashaID]
+        hasPremium = !freePlan
+        memberIDs = freePlan ? [] : [samID, ashaID]
         pets = [Pet(
             id: UUID(), ownerID: currentUserID!, name: "Bruno", species: .dog, breed: "Golden Retriever",
             birthDate: "2023-03-14", gender: .male, timezone: TimeZone.current.identifier

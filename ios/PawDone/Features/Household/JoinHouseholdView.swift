@@ -23,7 +23,7 @@ struct JoinHouseholdView: View {
                             errorMessage = nil
                         }
                 } footer: {
-                    Text("Ask the pet's owner to send you an invite from PawDone. Codes work for 7 days.")
+                    Text("Ask the pet's owner to send you an invite from TailTick. Codes work for 7 days.")
                 }
 
                 if let preview {

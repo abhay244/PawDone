@@ -39,7 +39,7 @@ private struct PremiumStatusView: View {
                             .resizable()
                             .frame(width: 64, height: 64)
                             .accessibilityHidden(true)
-                        Text("PawDone Premium")
+                        Text("TailTick Premium")
                             .font(.title2.bold())
                         Label("Active", systemImage: "checkmark.seal.fill")
                             .font(.subheadline.weight(.semibold))
@@ -66,7 +66,7 @@ private struct PremiumStatusView: View {
                     Benefit(symbol: "bell.badge.fill", title: "Done notifications",
                             detail: "Everyone hears when a task is finished.")
                     Benefit(symbol: "iphone.and.arrow.forward", title: "All your devices",
-                            detail: "Use PawDone on your iPhone and iPad at the same time.")
+                            detail: "Use TailTick on your iPhone and iPad at the same time.")
                 } header: {
                     Text("Included")
                 } footer: {

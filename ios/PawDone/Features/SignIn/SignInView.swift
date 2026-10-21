@@ -16,7 +16,7 @@ struct SignInView: View {
                 .resizable()
                 .frame(width: 112, height: 112)
                 .accessibilityHidden(true)
-            Text("PawDone")
+            Text("TailTick")
                 .font(.largeTitle.bold())
                 .padding(.top, 20)
             Text("Fed yet? Walked yet?\nNow you'll know.")

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Data PawDone keeps on this phone for the signed-in user.
+/// Data TailTick keeps on this phone for the signed-in user.
 enum LocalData {
     /// Removes it, e.g. after the account is deleted. The device ID stays: it identifies
     /// this phone, not the person.

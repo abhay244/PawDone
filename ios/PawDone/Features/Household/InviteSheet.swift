@@ -18,7 +18,7 @@ struct InviteSheet: View {
                 Text("Invite someone to help with \(petName)")
                     .font(.title2.bold())
                     .multilineTextAlignment(.center)
-                Text("They install PawDone, choose “Join a household” and enter this code:")
+                Text("They install TailTick, choose “Join a household” and enter this code:")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                 Text(InviteCode.display(invite.code))
@@ -50,7 +50,7 @@ struct InviteSheet: View {
     }
 
     private var message: String {
-        "Help me look after \(petName) on PawDone! Install the app, choose “Join a household” "
+        "Help me look after \(petName) on TailTick! Install the app, choose “Join a household” "
             + "and enter this code: \(InviteCode.display(invite.code)). It works for 7 days."
     }
 }
