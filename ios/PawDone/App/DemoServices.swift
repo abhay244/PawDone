@@ -2,16 +2,18 @@
 import Foundation
 
 // Demo mode: launch with `-PawDoneDemo` to use the app signed in, with in-memory data and
-// no server. For checking screens in the simulator, where Sign in with Apple is unreliable,
-// and for screenshots. Debug builds only.
+// no server. For checking screens in the simulator, where Sign in with Apple is unreliable.
+// Launch with `-PawDoneScreenshots` instead to skip setup and start with a lived-in account,
+// for App Store screenshots (see docs/APP_STORE.md). Debug builds only.
 
 extension AppServices {
-    static var isDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneDemo") }
+    static var isDemo: Bool { isScreenshotDemo || ProcessInfo.processInfo.arguments.contains("-PawDoneDemo") }
+    static var isScreenshotDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneScreenshots") }
 
     static func demo() -> AppServices {
         AppServices(
             session: SessionStore(backend: DemoSessionBackend(), deviceID: "demo-device"),
-            petBackend: DemoPetBackend(),
+            petBackend: DemoPetBackend(seeded: isScreenshotDemo),
             subscriptions: DemoSubscriptionService()
         )
     }
@@ -56,6 +58,45 @@ private final class DemoPetBackend: PetBackend {
     private var pets: [Pet] = []
     private var tasks: [PetTask] = []
     private var occurrences: [Occurrence] = []
+
+    init(seeded: Bool) {
+        if seeded { seedForScreenshots() }
+    }
+
+    /// Maya's dog Bruno, with Premium and two helpers. Today's tasks up to now are done,
+    /// shared between the three of them; the rest are still to do.
+    private func seedForScreenshots() {
+        myName = "Maya"
+        hasPremium = true
+        memberIDs = [samID, ashaID]
+        pets = [Pet(
+            id: UUID(), ownerID: currentUserID!, name: "Bruno", species: .dog, breed: "Golden Retriever",
+            birthDate: "2023-03-14", gender: .male, timezone: TimeZone.current.identifier
+        )]
+        let schedule: [(String, TaskCategory, Int, Int, String?)] = [
+            ("Morning walk", .walk, 7, 30, nil),
+            ("Breakfast", .food, 8, 0, "One cup of kibble, soaked."),
+            ("Fresh water", .water, 9, 0, nil),
+            ("Play in the park", .play, 16, 0, nil),
+            ("Evening walk", .walk, 18, 30, nil),
+            ("Dinner", .food, 19, 0, "One cup of kibble."),
+            ("Joint supplement", .medicine, 21, 0, "One chew after dinner."),
+        ]
+        let now = TimeOfDay(date: .now)
+        for (index, (title, category, hour, minute, instructions)) in schedule.enumerated() {
+            let task = PetTask(
+                id: UUID(), petID: pets[0].id, title: title, category: category,
+                timeOfDay: TimeOfDay(hour: hour, minute: minute), weekdays: .everyDay,
+                reminderEnabled: true, instructions: instructions
+            )
+            tasks.append(task)
+            occurrences.append(occurrence(for: task, done: task.timeOfDay < now, by: household[index % household.count]))
+            addHistory(for: task, index: index + 1)
+        }
+    }
+
+    /// Everyone who can mark tasks done: you, then your helpers.
+    private var household: [UUID] { [currentUserID!] + memberIDs }
 
     func fetchMyName() async throws -> String { myName }
     func saveMyName(_ name: String) async throws { myName = name }
@@ -112,7 +153,8 @@ private final class DemoPetBackend: PetBackend {
     private func addHistory(for task: PetTask, index: Int) {
         for daysAgo in 1...28 {
             let missed = (daysAgo * 7 + index * 3) % 11 == 0 || (daysAgo == 3 && index <= 3)
-            occurrences.append(occurrence(for: task, daysAgo: daysAgo, done: !missed))
+            let person = household[(daysAgo + index) % household.count]
+            occurrences.append(occurrence(for: task, daysAgo: daysAgo, done: !missed, by: person))
         }
     }
 
@@ -223,9 +265,9 @@ private final class DemoPetBackend: PetBackend {
 
     func deletePhoto(path: String) async throws { cloudPhotos[path] = nil }
 
-    /// An occurrence of a task, built the way the server would send it: pending today,
-    /// or done or missed on a past day.
-    private func occurrence(for task: PetTask, daysAgo: Int = 0, done: Bool = false) -> Occurrence {
+    /// An occurrence of a task, built the way the server would send it: done by `person`,
+    /// otherwise pending today or missed on a past day.
+    private func occurrence(for task: PetTask, daysAgo: Int = 0, done: Bool = false, by person: UUID? = nil) -> Occurrence {
         let timeZone = pets.first?.timeZone ?? .current
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
@@ -235,11 +277,11 @@ private final class DemoPetBackend: PetBackend {
             "id": UUID().uuidString, "task_id": task.id.uuidString, "pet_id": task.petID.uuidString,
             "date": ServerDate.dayString(for: day, in: timeZone), "scheduled_at": scheduled.ISO8601Format(),
             "title": task.title, "category": task.category.rawValue,
-            "status": daysAgo == 0 ? "pending" : done ? "done" : "missed",
+            "status": done ? "done" : daysAgo == 0 ? "pending" : "missed",
             "task": ["instructions": task.instructions.map { $0 as Any } ?? NSNull()],
         ]
-        if daysAgo > 0, done, let currentUserID {
-            json["completed_by"] = currentUserID.uuidString
+        if done, let completedBy = person ?? currentUserID {
+            json["completed_by"] = completedBy.uuidString
             json["completed_at"] = scheduled.addingTimeInterval(8 * 60).ISO8601Format()
         }
         let data = try! JSONSerialization.data(withJSONObject: json)

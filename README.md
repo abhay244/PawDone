@@ -101,7 +101,11 @@ Premium is an auto-renewing subscription sold through the App Store and managed 
   ```bash
   python3 -m http.server 8765 --directory site
   ```
-- **Keep the privacy policy accurate:** update it whenever the app starts collecting new data or uses a new service.
+- **Keep the privacy policy accurate:** update it whenever the app starts collecting new data or uses a new service, along with the App Privacy answers in [docs/APP_STORE.md](docs/APP_STORE.md) and `ios/PawDone/Resources/PrivacyInfo.xcprivacy`.
+
+## App Store
+
+[docs/APP_STORE.md](docs/APP_STORE.md) has the listing text, App Privacy and age rating answers, review notes, and how to upload a build. Screenshots are in `design/app-store/screenshots/`; to retake them, launch the Debug app with `-PawDoneScreenshots` (a ready-made demo account) and run `design/app-store/make-screenshots.swift`.
 
 ## Account deletion
 
