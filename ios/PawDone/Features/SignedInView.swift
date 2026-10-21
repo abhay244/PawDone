@@ -6,8 +6,8 @@ struct SignedInView: View {
     @State private var premium: PremiumStore
     @Environment(\.scenePhase) private var scenePhase
 
-    init(backend: any PetBackend, subscriptions: (any SubscriptionService)?) {
-        _store = State(initialValue: PetStore(backend: backend))
+    init(backend: any PetBackend, subscriptions: (any SubscriptionService)?, now: @escaping () -> Date = { .now }) {
+        _store = State(initialValue: PetStore(backend: backend, now: now))
         _premium = State(initialValue: PremiumStore(service: subscriptions, backend: backend))
     }
 

@@ -41,9 +41,9 @@ struct MarkDoneSheet: View {
                             .clipShape(.rect(cornerRadius: 12))
                         Button("Retake photo") { showingCamera = true }
                         Button("Remove photo", role: .destructive) { self.photo = nil }
-                    } else if CameraPicker.isAvailable {
+                    } else if CameraPicker.showsButton {
                         Button {
-                            showingCamera = true
+                            if CameraPicker.isAvailable { showingCamera = true }
                         } label: {
                             Label("Take photo", systemImage: "camera")
                         }

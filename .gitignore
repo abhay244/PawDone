@@ -17,3 +17,7 @@ supabase/.temp/
 
 # Local Claude Code settings
 .claude/
+
+# Built YouTube Shorts and their music (make them with design/shorts/make-shorts.swift)
+design/shorts/output/
+design/shorts/music.wav

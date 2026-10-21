@@ -7,6 +7,15 @@ struct CameraPicker: UIViewControllerRepresentable {
         UIImagePickerController.isSourceTypeAvailable(.camera)
     }
 
+    /// Whether to offer the camera. The screenshot demo offers it in the simulator too, which has
+    /// no camera, so recordings look as they would on a phone; tapping it does nothing there.
+    static var showsButton: Bool {
+        #if DEBUG
+        if AppServices.isScreenshotDemo { return true }
+        #endif
+        return isAvailable
+    }
+
     @Binding var image: UIImage?
     @Environment(\.dismiss) private var dismiss
 

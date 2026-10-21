@@ -4,6 +4,7 @@ import SwiftUI
 struct RootView: View {
     let petBackend: (any PetBackend)?
     let subscriptions: (any SubscriptionService)?
+    var now: () -> Date = { .now }
 
     @Environment(SessionStore.self) private var session
     @Environment(\.scenePhase) private var scenePhase
@@ -21,7 +22,7 @@ struct RootView: View {
                 SignedOutElsewhereView()
             case .signedIn:
                 if let petBackend {
-                    SignedInView(backend: petBackend, subscriptions: subscriptions)
+                    SignedInView(backend: petBackend, subscriptions: subscriptions, now: now)
                 }
             }
         }

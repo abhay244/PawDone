@@ -8,6 +8,8 @@ struct AppServices {
     let petBackend: (any PetBackend)?
     /// Nil until a RevenueCat key is set in Config/Secrets.xcconfig.
     let subscriptions: (any SubscriptionService)?
+    /// The current time. Only the demo changes it (see DemoServices).
+    var now: () -> Date = { .now }
 
     static func live() -> AppServices {
         #if DEBUG

@@ -5,18 +5,33 @@ import Foundation
 // no server. For checking screens in the simulator, where Sign in with Apple is unreliable.
 // Launch with `-PawDoneScreenshots` instead to skip setup and start with a lived-in account,
 // for App Store screenshots (see docs/APP_STORE.md). Add `-PawDoneFreePlan` to start that
-// account without Premium, to show the paywall. Debug builds only.
+// account without Premium, to show the paywall, and `-PawDoneDemoTime 17:50` to run as if it
+// were that time today. Debug builds only.
 
 extension AppServices {
     static var isDemo: Bool { isScreenshotDemo || ProcessInfo.processInfo.arguments.contains("-PawDoneDemo") }
     static var isScreenshotDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneScreenshots") }
     static var isFreePlanDemo: Bool { ProcessInfo.processInfo.arguments.contains("-PawDoneFreePlan") }
 
+    /// The demo's clock: `-PawDoneDemoTime HH:mm` sets it to that time today, and it keeps
+    /// ticking from there, so recordings look the same whenever they're made.
+    static func demoNow() -> Date { .now.addingTimeInterval(demoTimeOffset) }
+
+    private static let demoTimeOffset: TimeInterval = {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let index = arguments.firstIndex(of: "-PawDoneDemoTime"), index + 1 < arguments.count,
+              let time = TimeOfDay(databaseValue: arguments[index + 1]),
+              let start = Calendar.current.date(bySettingHour: time.hour, minute: time.minute, second: 0, of: .now)
+        else { return 0 }
+        return start.timeIntervalSinceNow
+    }()
+
     static func demo() -> AppServices {
         AppServices(
             session: SessionStore(backend: DemoSessionBackend(), deviceID: "demo-device"),
             petBackend: DemoPetBackend(seeded: isScreenshotDemo, freePlan: isFreePlanDemo),
-            subscriptions: DemoSubscriptionService()
+            subscriptions: DemoSubscriptionService(),
+            now: demoNow
         )
     }
 }
@@ -84,7 +99,7 @@ private final class DemoPetBackend: PetBackend {
             ("Dinner", .food, 19, 0, "One cup of kibble."),
             ("Joint supplement", .medicine, 21, 0, "One chew after dinner."),
         ]
-        let now = TimeOfDay(date: .now)
+        let now = TimeOfDay(date: AppServices.demoNow())
         for (index, (title, category, hour, minute, instructions)) in schedule.enumerated() {
             let task = PetTask(
                 id: UUID(), petID: pets[0].id, title: title, category: category,
@@ -189,7 +204,7 @@ private final class DemoPetBackend: PetBackend {
         guard let index = occurrences.firstIndex(where: { $0.id == id }) else { throw NotSignedIn() }
         occurrences[index].status = .done
         occurrences[index].completedBy = currentUserID
-        occurrences[index].completedAt = .now
+        occurrences[index].completedAt = AppServices.demoNow()
         occurrences[index].note = note
         occurrences[index].photoPath = photoPath
         return occurrences[index]
@@ -273,7 +288,8 @@ private final class DemoPetBackend: PetBackend {
         let timeZone = pets.first?.timeZone ?? .current
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
-        let day = calendar.date(byAdding: .day, value: -daysAgo, to: .now) ?? .now
+        let today = AppServices.demoNow()
+        let day = calendar.date(byAdding: .day, value: -daysAgo, to: today) ?? today
         let scheduled = calendar.date(bySettingHour: task.timeOfDay.hour, minute: task.timeOfDay.minute, second: 0, of: day) ?? day
         var json: [String: Any] = [
             "id": UUID().uuidString, "task_id": task.id.uuidString, "pet_id": task.petID.uuidString,

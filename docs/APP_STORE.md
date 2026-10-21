@@ -22,9 +22,9 @@ To retake them after a UI change:
 
 1. Boot the iPhone 17 Pro Max simulator, set light mode and a clean status bar:
    `xcrun simctl status_bar booted override --time 9:41 --batteryState discharging --batteryLevel 100 --wifiBars 3 --cellularBars 4 --operatorName ""`
-2. Build the Debug app and launch it with `-PawDoneScreenshots`, which starts signed in to a
-   ready-made account: Bruno the dog, two helpers, Premium and a month of history. Today's
-   tasks before the current time are done, so take them during the day.
+2. Build the Debug app and launch it with `-PawDoneScreenshots -PawDoneDemoTime 09:41`, which
+   starts signed in to a ready-made account (Bruno the dog, two helpers, Premium and a month of
+   history) and runs as if it were 9:41 AM, so the morning tasks are done and the rest are due.
 3. Save each screen with `xcrun simctl io booted screenshot design/app-store/raw/<name>.png`
    (`today`, `family`, `reports`, `task`, `premium`, `schedule`). Reports has the 14th
    selected; `task` is Joint supplement opened from Schedule.

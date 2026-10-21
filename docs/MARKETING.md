@@ -137,6 +137,11 @@ problem in the first 2 seconds.
 
 ## YouTube Shorts
 
+Three ready-made Shorts (shared checklist, medicine, pet sitter) with voiceover and music are
+in `design/shorts/output/`, with titles and descriptions in
+[design/shorts/README.md](../design/shorts/README.md). The ideas below are for more, filmed
+with your own pet.
+
 Same vertical format, 20–40 seconds, one idea each, hook in the first 2 seconds. End with
 "Search TailTick on the App Store" on screen. Links in Shorts descriptions and comments
 aren't clickable, so put the App Store link on the channel profile, where it is.
