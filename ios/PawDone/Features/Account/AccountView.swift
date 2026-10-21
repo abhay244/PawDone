@@ -32,7 +32,7 @@ struct AccountView: View {
                     Link(destination: AppConfig.supportURL) {
                         Label("Help & support", systemImage: "questionmark.circle")
                     }
-                    if let contact = URL(string: "mailto:\(AppConfig.supportEmail)?subject=PawDone%20support") {
+                    if let contact = URL(string: "mailto:\(AppConfig.supportEmail)?subject=TailTick%20support") {
                         Link(destination: contact) {
                             Label("Contact us", systemImage: "envelope")
                         }
@@ -184,7 +184,7 @@ struct AccountView: View {
     private var premiumSection: some View {
         Section {
             if store.iHavePremium {
-                LabeledContent("PawDone Premium", value: "Active")
+                LabeledContent("TailTick Premium", value: "Active")
                 if let expiresAt = store.myEntitlement?.expiresAt {
                     LabeledContent("Renews or ends", value: expiresAt.formatted(date: .abbreviated, time: .omitted))
                 }
@@ -193,14 +193,14 @@ struct AccountView: View {
                 Button {
                     isShowingPaywall = true
                 } label: {
-                    Label("Get PawDone Premium", systemImage: "star.fill")
+                    Label("Get TailTick Premium", systemImage: "star.fill")
                 }
             }
         } header: {
             Text("Premium")
         } footer: {
             if !store.iHavePremium {
-                Text("Invite family and helpers, share photo proof and use PawDone on all your devices.")
+                Text("Invite family and helpers, share photo proof and use TailTick on all your devices.")
             }
         }
     }
@@ -220,7 +220,7 @@ struct AccountView: View {
                 Text("Notifications")
             } footer: {
                 Text(PushRegistrar.shared.authorizationStatus == .denied
-                    ? "Notifications are off for PawDone, so reminders can't reach this phone."
+                    ? "Notifications are off for TailTick, so reminders can't reach this phone."
                     : "A notification when one of \(pet.name)'s tasks is due and not done yet.")
             }
         }

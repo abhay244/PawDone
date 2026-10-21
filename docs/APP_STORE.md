@@ -1,6 +1,6 @@
 # App Store listing
 
-Everything to fill in on App Store Connect for PawDone 1.0, ready to copy. Character limits
+Everything to fill in on App Store Connect for TailTick 1.0, ready to copy. Character limits
 are in brackets.
 
 ## Upload a build
@@ -13,7 +13,7 @@ run `xcodegen` in `ios/`, then in Xcode pick **Any iOS Device**, **Product → A
 ## Screenshots
 
 Upload `design/app-store/screenshots/*.jpg`, in order, to the **iPhone 6.9" Display** slot.
-App Store Connect scales them down for smaller iPhones. PawDone is iPhone-only, so no iPad
+App Store Connect scales them down for smaller iPhones. TailTick is iPhone-only, so no iPad
 screenshots are needed.
 
 They contain no prices: prices differ by country and Apple rejects screenshots that show them.
@@ -30,11 +30,28 @@ To retake them after a UI change:
    selected; `task` is Joint supplement opened from Schedule.
 4. In `design/app-store/`, run `swift make-screenshots.swift`. Captions are set in that file.
 
+### Subscription review screenshot
+
+Each subscription's **Review Information** needs a screenshot of where it's sold: upload
+`design/app-store/subscription-review-paywall.png` to both. To retake it, launch with
+`-PawDoneScreenshots -PawDoneFreePlan` (the same account without Premium) and open the
+Premium tab. Only App Review sees it, so the prices on it don't matter.
+
+## Subscriptions
+
+| Field | Value |
+|---|---|
+| Subscription group display name | TailTick Premium |
+| Monthly | `com.abhaysingh.pawdone.premium.monthly` |
+| 3 months | `com.abhaysingh.pawdone.premium.quarterly` |
+
+The product IDs keep the app's old working name; customers never see them.
+
 ## App Information
 
 | Field | Value |
 |---|---|
-| Name [30] | PawDone |
+| Name [30] | TailTick |
 | Subtitle [30] | Pet care schedule & reminders |
 | Primary category | Lifestyle |
 | Secondary category | Productivity |
@@ -65,9 +82,9 @@ Share your pet's daily care with family and helpers. See what's done, who did it
 ### Description [4000]
 
 ```
-PawDone keeps your pet's daily care on track, even when several people share it.
+TailTick keeps your pet's daily care on track, even when several people share it.
 
-Set up your pet's routine once: walks, meals, fresh water, medicine, grooming and play. PawDone shows today's list, reminds you when something is due, and records who did each task and when.
+Set up your pet's routine once: walks, meals, fresh water, medicine, grooming and play. TailTick shows today's list, reminds you when something is due, and records who did each task and when.
 
 TODAY AT A GLANCE
 • Every task for the day, and what's still left
@@ -90,7 +107,7 @@ PREMIUM: SHARE THE CARE
 • Helpers see your pet's day and mark tasks done; only you can change the schedule
 • Photo proof is shared with everyone in the household
 • Everyone gets a notification when a task is done
-• Use PawDone on all your devices at the same time
+• Use TailTick on all your devices at the same time
 
 The free plan is free forever: one pet, the full schedule, reminders, photo proof on your phone and reports, on one iPhone.
 
@@ -100,7 +117,7 @@ Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 Privacy Policy: https://abhay244.github.io/PawDone/privacy/
 ```
 
-The Terms of Use link is required for apps with subscriptions (guideline 3.1.2). PawDone uses
+The Terms of Use link is required for apps with subscriptions (guideline 3.1.2). TailTick uses
 Apple's standard licence agreement, so leave the custom EULA field in App Information empty.
 
 ### Keywords [100]
@@ -129,7 +146,7 @@ here, or the app is reviewed without them and the paywall shows no plans.
 
 ### App Review information
 
-Untick **Sign-in required**: PawDone only offers Sign in with Apple and Google, so there's no
+Untick **Sign-in required**: TailTick only offers Sign in with Apple and Google, so there's no
 demo username and password. The notes explain how to get in.
 
 Notes:
@@ -158,7 +175,7 @@ Contact information: your name, phone number and email, used only by App Review.
 
 ## App Privacy
 
-**Data collection**: Yes, PawDone collects data. For every type below, answer: used for
+**Data collection**: Yes, TailTick collects data. For every type below, answer: used for
 **App Functionality** only, **linked to the user**, **not used for tracking**.
 
 | Category | Type | What it is |
@@ -178,7 +195,7 @@ change both together.
 
 - **Price**: Free (Premium is sold in the app).
 - **Availability**: all countries, except **China mainland**. Apps there need a government
-  ICP filing number, which PawDone doesn't have.
+  ICP filing number, which TailTick doesn't have.
 - **EU Digital Services Act**: App Store Connect asks whether you're a trader. Someone
   selling subscriptions usually is, and traders' address, phone and email are shown on the
   EU App Stores. If you'd rather not publish those, remove the EU countries from

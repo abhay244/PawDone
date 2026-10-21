@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- PawDone doesn't track users across apps or websites. -->
+	<!-- TailTick doesn't track users across apps or websites. -->
 	<key>NSPrivacyTracking</key>
 	<false/>
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
-	<!-- What PawDone collects; mirrors the App Privacy answers in docs/APP_STORE.md. -->
+	<!-- What TailTick collects; mirrors the App Privacy answers in docs/APP_STORE.md. -->
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>
 		<dict>
@@ -95,11 +95,11 @@
 			</array>
 		</dict>
 	</array>
-	<!-- Required-reason APIs used by PawDone's own code (packages declare their own). -->
+	<!-- Required-reason APIs used by TailTick's own code (packages declare their own). -->
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>
-			<!-- Remembers which pet was shown last; only read and written by PawDone. -->
+			<!-- Remembers which pet was shown last; only read and written by TailTick. -->
 			<key>NSPrivacyAccessedAPIType</key>
 			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
 			<key>NSPrivacyAccessedAPITypeReasons</key>

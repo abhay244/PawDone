@@ -1,4 +1,4 @@
-# PawDone — Product Spec (v1)
+# TailTick — Product Spec (v1)
 
 **Status:** Final for v1 · **Last updated:** 13 Oct 2026
 
@@ -6,7 +6,7 @@
 
 ## 1. Summary
 
-PawDone is an iPhone app where pet owners set a daily care schedule for their pet, tick off each task as it happens (with an optional photo as proof), get reminders when tasks are due, and see a day-by-day report of what was done and what was missed.
+TailTick is an iPhone app where pet owners set a daily care schedule for their pet, tick off each task as it happens (with an optional photo as proof), get reminders when tasks are due, and see a day-by-day report of what was done and what was missed.
 
 Paying owners can invite up to 2 family members or helpers. They can see the pet's daily updates and mark tasks done, so the pet is covered while the owner is away.
 
@@ -14,8 +14,8 @@ Paying owners can invite up to 2 family members or helpers. They can see the pet
 
 | | |
 |---|---|
-| Name | **PawDone** |
-| App Store title | PawDone: Pet Care Tracker |
+| Name | **TailTick** |
+| App Store title | TailTick (subtitle: Pet care schedule & reminders) |
 | Tagline | Fed yet? Walked yet? Now you'll know. |
 | Icon | White paw with a check on a coral gradient ([design/](../design)) |
 | Platform | iPhone only (iOS 17+) |
@@ -236,7 +236,7 @@ Shows today's tasks for each pet, sorted by time. Each task has one status:
 These need the owner's own identity and payment details:
 - [ ] Join the Apple Developer Program ($99/year)
 - [ ] Sign the Paid Apps agreement in App Store Connect and add bank and tax details (needed for subscriptions, even in testing)
-- [ ] Reserve **PawDone** in App Store Connect; check the domain, X handle (@pawdone) and trademark databases
+- [ ] Reserve **TailTick** in App Store Connect; check the domain, X handle (@tailtick) and trademark databases
 - [ ] Create free Supabase and RevenueCat accounts
 - [ ] Get a domain and publish privacy policy and terms pages
 

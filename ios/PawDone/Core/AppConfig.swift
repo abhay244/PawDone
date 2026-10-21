@@ -24,7 +24,7 @@ enum AppConfig {
         #endif
     }
 
-    /// Apple's standard licence agreement, used as PawDone's terms of use.
+    /// Apple's standard licence agreement, used as TailTick's terms of use.
     static let termsOfUseURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
     /// Published from site/ by .github/workflows/pages.yml.

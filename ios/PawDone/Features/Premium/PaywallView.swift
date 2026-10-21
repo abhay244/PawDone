@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// PawDone Premium: what it adds, the plans, and Apple's required subscription details.
+/// TailTick Premium: what it adds, the plans, and Apple's required subscription details.
 /// Shown as a sheet (with Close), or as the Premium tab for users without Premium.
 struct PaywallView: View {
     /// False when shown as a tab: no Close button, and nothing to dismiss after buying.
@@ -62,7 +62,7 @@ struct PaywallView: View {
                 .resizable()
                 .frame(width: 72, height: 72)
                 .accessibilityHidden(true)
-            Text("PawDone Premium")
+            Text("TailTick Premium")
                 .font(.largeTitle.bold())
             Text("Share \(store.pet?.name ?? "your pet")'s care with the people who help.")
                 .font(.title3)
@@ -87,7 +87,7 @@ struct PaywallView: View {
             Benefit(symbol: "bell.badge.fill", title: "Know when it's done",
                     detail: "A notification as soon as someone finishes a task.")
             Benefit(symbol: "iphone.and.arrow.forward", title: "All your devices",
-                    detail: "Use PawDone on your iPhone and iPad at the same time.")
+                    detail: "Use TailTick on your iPhone and iPad at the same time.")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

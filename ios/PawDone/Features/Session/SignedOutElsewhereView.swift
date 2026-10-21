@@ -14,7 +14,7 @@ struct SignedOutElsewhereView: View {
             Text("Signed in on another device")
                 .font(.title2.bold())
                 .multilineTextAlignment(.center)
-            Text("Your PawDone account is now in use on another iPhone. Free accounts can be used on one phone at a time.")
+            Text("Your TailTick account is now in use on another iPhone. Free accounts can be used on one phone at a time.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             Spacer()

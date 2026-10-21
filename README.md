@@ -1,6 +1,8 @@
-# PawDone
+# TailTick
 
 Pet care schedules with photo proof, shared with family and helpers. iPhone app (SwiftUI) with a Supabase backend.
+
+The app was called PawDone until just before launch. Users only see TailTick, but PawDone stays where renaming would break things or isn't worth it: the Xcode project, targets and folders, the bundle ID `com.abhaysingh.pawdone`, the subscription product IDs, the GitHub repository and the website address.
 
 - Product spec: [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md)
 - App icon and logo: [design/](design)
